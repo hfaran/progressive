@@ -10,8 +10,8 @@ class Bar(object):
 
     Many parts of this class are thanks to Erik Rose's implementation
     of ``ProgressBar`` in ``nose-progressive``, licensed under
-    GPL.
-    `GPL <https://www.gnu.org/copyleft/gpl.html>`_
+    The MIT License.
+    `MIT <http://opensource.org/licenses/MIT>`_
     `nose-progressive/noseprogressive/bar.py <https://github.com/erikrose/nose-progressive/blob/master/noseprogressive/bar.py>`_
 
     :type  term: blessings.Terminal()
