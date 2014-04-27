@@ -3,6 +3,11 @@
 
 import types
 from signal import signal, SIGWINCH
+from ensure import check
+
+
+class ColorUnsupportedError(StandardError):
+    """Color is not supported by terminal"""
 
 
 class Bar(object):
@@ -38,24 +43,42 @@ class Bar(object):
     :param start_char: Character at the start of the progress bar
     :type  end_char: unicode
     :param end_char: Character at the end of the progress bar
+    :type  fallback: bool
+    :param fallback: If this is set, if the terminal does not support
+        provided colors, this will fall back to plain formatting
+        that works on terminals with no color support
     """
 
     def __init__(self, term, max_value=100, filled_color="cyan",
                  empty_color="white", back_color=None,
                  filled_char=u' ', empty_char=u' ',
-                 start_char=u'', end_char=u''):
+                 start_char=u'', end_char=u'', fallback=False,
+                 fallback_empty_char=u'◯', fallback_filled_char=u'◉'):
         self._term = term
         self.stream = term.stream
         self.max_value = max_value
-        self.filled_color = filled_color
-        self.empty_color = empty_color
-        self.back_color = back_color
-        self.filled_char = filled_char
-        self.empty_char = empty_char
+
+        # Setup callables and characters depending on if terminal has
+        #   has color support
+        self._has_color = self._check_has_color(term, filled_color, empty_color)
+        if self._has_color:
+            self._filled_char = filled_char
+            self._empty_char = empty_char
+            self._filled = self._get_format_callable(term, filled_color, back_color)
+            self._empty = self._get_format_callable(term, empty_color, back_color)
+        else:
+            if fallback:
+                self._empty_char = fallback_empty_char
+                self._filled_char = fallback_filled_char
+                self._filled = self._empty = lambda s: s
+            else:
+                raise ColorUnsupportedError
+
         self.start_char = start_char
         self.end_char = end_char
 
         self._measure_terminal()
+
         # Handle window resize
         signal(SIGWINCH, self._handle_winch)
 
@@ -63,23 +86,42 @@ class Bar(object):
     # Private Methods #
     ###################
 
-    def _get_format_callable(self, color):
+    @staticmethod
+    def _check_has_color(term, filled_color, empty_color):
+        try:
+            for color in [filled_color, empty_color]:
+                if isinstance(color, str):
+                    req_colors = 16 if "bright" in color else 8
+                    check(term.number_of_colors
+                    ).is_greater_than_or_equal_to(
+                        req_colors).or_raise(ColorUnsupportedError)
+                elif isinstance(color, int):
+                    check(term.number_of_colors
+                    ).is_greater_than_or_equal_to(
+                        color).or_raise(ColorUnsupportedError)
+            else:
+                return True
+        except ColorUnsupportedError:
+            return False
+
+    @staticmethod
+    def _get_format_callable(term, color, back_color):
         """Get blessings.Terminal() callable"""
         if isinstance(color, str):
-            assert any(isinstance(self.back_color,
+            assert any(isinstance(back_color,
                                   t) for t in [str, types.NoneType])
-            if self.back_color:
-                return getattr(self._term, color)
-            elif self.back_color is None:
-                return getattr(self._term, "_".join(
-                    [color, "on", self.back_color]
+            if back_color:
+                return getattr(term, color)
+            elif back_color is None:
+                return getattr(term, "_".join(
+                    [color, "on", back_color]
                 ))
             else:
                 raise TypeError("Invalid type {} for self.back_color".format(
-                    type(self.back_color)
+                    type(back_color)
                 ))
         elif isinstance(color, int):
-            return self._term.on_color(color)
+            return term.on_color(color)
         else:
             raise TypeError("Invalid type {} for color".format(
                 type(color)
@@ -103,8 +145,8 @@ class Bar(object):
 
     @property
     def filled(self):
-        return self._get_format_callable(self.filled_color)
+        return self._filled
 
     @property
     def empty(self):
-        return self._get_format_callable(self.empty_color)
+        return self._empty
