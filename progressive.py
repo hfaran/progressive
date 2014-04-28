@@ -272,8 +272,8 @@ class Bar(object):
             bar_str = "{} {}".format(self.title, bar_str)
         elif self.title_pos == "right":
             bar_str = "{} {}".format(bar_str, self.title)
-        # Add return character and indent
-        bar_str = ''.join(["\r", " " * self.indent, bar_str])
+        # Add indent
+        bar_str = ''.join([" " * self.indent, bar_str])
         # Add complete percentage of fraction
         bar_str = "{} {}".format(bar_str, amount_complete_str)
 
