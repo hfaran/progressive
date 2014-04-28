@@ -50,7 +50,7 @@ def progressive_example():
     from curses import tigetstr
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, indent=4, title_pos="left")
+    b = Bar(term, max_value=10, indent=4, title_pos="left", fallback=True)
 
     for i in range(11):
         sleep(1 * random.random())

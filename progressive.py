@@ -148,11 +148,11 @@ class Bar(object):
                 if isinstance(color, str):
                     req_colors = 16 if "bright" in color else 8
                     ensure(term.number_of_colors >= req_colors,
-                           ColorUnsupportedError, color,
+                           ColorUnsupportedError,
                            "{} is unsupported by your terminal.".format(color))
                 elif isinstance(color, int):
                     ensure(term.number_of_colors >= color,
-                           ColorUnsupportedError, color,
+                           ColorUnsupportedError,
                            "{} is unsupported by your terminal.".format(color))
             except ColorUnsupportedError as e:
                 if raise_err:
@@ -270,36 +270,36 @@ class Bar(object):
 
         # e.g., '10/20' if 'fraction' or '50%' if 'percentage'
         amount_complete_str = (
-            "{}/{}".format(self.value, self.max_value)
+            u"{}/{}".format(self.value, self.max_value)
             if self.num_rep == "fraction" else
-            "{}%".format(int(floor(amount_complete * 100)))
+            u"{}%".format(int(floor(amount_complete * 100)))
         )
 
         bar_str = ''
         if self.title_pos == "above":
-            bar_str += "{}{}".format(
+            bar_str += u"{}{}\n".format(
                 " " * self.indent,
                 self.title,
             )
         # Construct just the progress bar
-        bar_str += ''.join([
+        bar_str += u''.join([
             # str() casting for type-hinting
-            str(self.filled(self._filled_char * fill_amount)),
-            str(self.empty(self._empty_char * empty_amount)),
+            unicode(self.filled(self._filled_char * fill_amount)),
+            unicode(self.empty(self._empty_char * empty_amount)),
         ])
         # Wrap with start and end character
-        bar_str = "{}{}{}".format(self.start_char, bar_str, self.end_char)
+        bar_str = u"{}{}{}".format(self.start_char, bar_str, self.end_char)
         # Add on title if supposed to be on left or right
         if self.title_pos == "left":
-            bar_str = "{} {}".format(self.title, bar_str)
+            bar_str = u"{} {}".format(self.title, bar_str)
         elif self.title_pos == "right":
-            bar_str = "{} {}".format(bar_str, self.title)
+            bar_str = u"{} {}".format(bar_str, self.title)
         # Add indent
-        bar_str = ''.join([" " * self.indent, bar_str])
+        bar_str = u''.join([" " * self.indent, bar_str])
         # Add complete percentage of fraction
-        bar_str = "{} {}".format(bar_str, amount_complete_str)
+        bar_str = u"{} {}".format(bar_str, amount_complete_str)
         # Set back to normal after printing
-        bar_str = "{}{}".format(bar_str, self._term.normal)
+        bar_str = u"{}{}".format(bar_str, self._term.normal)
 
         # Write and flush
         self._term.stream.write(bar_str)
