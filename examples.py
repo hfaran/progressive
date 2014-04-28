@@ -47,9 +47,10 @@ def blessings_progress_example():
 def progressive_example():
     from blessings import Terminal
     from progressive import Bar
+    from curses import tigetstr
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, indent=0, title_pos="left")
+    b = Bar(term, max_value=10, indent=4, title_pos="left")
 
     for i in range(11):
         sleep(1 * random.random())
@@ -57,9 +58,18 @@ def progressive_example():
         # t.stream.write(t.save)
         # ...
         # t.stream.write(t.restore)
-        with t.location():
-            b.value = i
-            b.draw()
+        t.stream.write(tigetstr('sc'))
+        b.value = i
+        b.draw()
+        t.stream.write(tigetstr('cud1'))
+        t.stream.write(tigetstr('el1'))
+        b.draw()
+        t.stream.write(tigetstr('cud1'))
+        t.stream.write(tigetstr('el1'))
+        if i != 10:
+            t.stream.write(tigetstr('rc'))
+        t.stream.flush()
+
     print(t.normal)
 
 

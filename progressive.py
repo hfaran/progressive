@@ -275,8 +275,14 @@ class Bar(object):
             "{}%".format(int(floor(amount_complete * 100)))
         )
 
+        bar_str = ''
+        if self.title_pos == "above":
+            bar_str += "{}{}".format(
+                " " * self.indent,
+                self.title,
+            )
         # Construct just the progress bar
-        bar_str = ''.join([
+        bar_str += ''.join([
             # str() casting for type-hinting
             str(self.filled(self._filled_char * fill_amount)),
             str(self.empty(self._empty_char * empty_amount)),
@@ -297,4 +303,4 @@ class Bar(object):
 
         # Write and flush
         self._term.stream.write(bar_str)
-        self._term.stream.flush()
+        #self._term.stream.flush()
