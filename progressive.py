@@ -2,7 +2,6 @@
 
 from __future__ import division
 
-from signal import signal, SIGWINCH
 from math import floor
 
 
@@ -129,10 +128,6 @@ class Bar(object):
             self._filled_char = fallback_filled_char
             self._filled = self._empty = lambda s: s
 
-        # Handle window resize
-        # TODO: Winch handling should be done by user of Bar
-        # signal(SIGWINCH, self._handle_winch)
-
     ###################
     # Private Methods #
     ###################
@@ -198,12 +193,6 @@ class Bar(object):
                 type(color)
             ))
 
-    # TODO: Winch handling should be done by user of Bar
-    # def _handle_winch(self, *args):
-    #     # self.erase()  # Doesn't seem to help.
-    #     self._measure_terminal()
-    #     self.draw()
-
     def _measure_terminal(self):
         self.lines, self.columns = (
             self._term.height or 24,
@@ -261,6 +250,14 @@ class Bar(object):
         self._value = val
 
     def draw(self):
+        # This is essentially winch-handling without having
+        #   to do winch-handling; cleanly redrawing on winch is difficult
+        #   and out of the intended scope of this class; we CAN
+        #   however, adjust the next draw to be proper by re-measuring
+        #   the terminal since the code is mostly written dynamically
+        #   and many attributes and dynamically calculated properties.
+        self._measure_terminal()
+
         amount_complete = self.value / self.max_value
         fill_amount = int(floor(amount_complete * self.max_width))
         empty_amount = self.max_width - fill_amount
