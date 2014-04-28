@@ -90,12 +90,15 @@ class Bar(object):
         self.max_value = max_value
         self._value = 0
 
-        ensure(title_pos in ["left", "right", "above", "below"], ValueError)
+        ensure(title_pos in ["left", "right", "above", "below"], ValueError,
+               "Invalid choice for title position.")
         self.title_pos = title_pos
         self.title = title
-        ensure(num_rep in ["fraction", "percentage"], ValueError)
+        ensure(num_rep in ["fraction", "percentage"], ValueError,
+               "num_rep must be either 'fraction' or 'percentage'.")
         self.num_rep = num_rep
-        ensure(indent < self.columns, ValueError)
+        ensure(indent < self.columns, ValueError,
+               "Indent must be smaller than terminal width.")
         self.indent = indent
 
         self.start_char = start_char
@@ -127,7 +130,8 @@ class Bar(object):
             self._filled = self._empty = lambda s: s
 
         # Handle window resize
-        signal(SIGWINCH, self._handle_winch)
+        # TODO: Winch handling should be done by user of Bar
+        # signal(SIGWINCH, self._handle_winch)
 
     ###################
     # Private Methods #
@@ -149,10 +153,12 @@ class Bar(object):
                 if isinstance(color, str):
                     req_colors = 16 if "bright" in color else 8
                     ensure(term.number_of_colors >= req_colors,
-                           ColorUnsupportedError, color)
+                           ColorUnsupportedError, color,
+                           "{} is unsupported by your terminal.".format(color))
                 elif isinstance(color, int):
                     ensure(term.number_of_colors >= color,
-                           ColorUnsupportedError, color)
+                           ColorUnsupportedError, color,
+                           "{} is unsupported by your terminal.".format(color))
             except ColorUnsupportedError as e:
                 if raise_err:
                     raise e
@@ -174,8 +180,11 @@ class Bar(object):
         :returns: callable(s: str) -> str
         """
         if isinstance(color, str):
-            assert any(isinstance(back_color,
-                                  t) for t in [str, type(None)])
+            ensure(
+                any(isinstance(back_color, t) for t in [str, type(None)]),
+                TypeError,
+                "back_color must be a str or NoneType"
+            )
             if back_color:
                 return getattr(term, "_".join(
                     [color, "on", back_color]
@@ -189,10 +198,11 @@ class Bar(object):
                 type(color)
             ))
 
-    def _handle_winch(self, *args):
-        # self.erase()  # Doesn't seem to help.
-        self._measure_terminal()
-        self.draw()
+    # TODO: Winch handling should be done by user of Bar
+    # def _handle_winch(self, *args):
+    #     # self.erase()  # Doesn't seem to help.
+    #     self._measure_terminal()
+    #     self.draw()
 
     def _measure_terminal(self):
         self.lines, self.columns = (
@@ -216,10 +226,13 @@ class Bar(object):
                "Width unit must be either 'c' or '%'")
 
         if unit == "c":
-            ensure(value <= self.columns, ValueError)
+            ensure(value <= self.columns, ValueError,
+                   "Terminal only has {} columns, cannot draw "
+                   "bar of size {}.".format(self.columns, value))
             retval = value
         else:  # unit == "%"
-            ensure(0 < value <= 100, ValueError)
+            ensure(0 < value <= 100, ValueError,
+                   "value=={} does not satisfy 0 < value <= 100".format(value))
             dec = value / 100
             retval = dec * self.columns
 
