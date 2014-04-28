@@ -173,15 +173,11 @@ class Bar(object):
             assert any(isinstance(back_color,
                                   t) for t in [str, type(None)])
             if back_color:
-                return getattr(term, color)
-            elif back_color is None:
                 return getattr(term, "_".join(
                     [color, "on", back_color]
                 ))
-            else:
-                raise TypeError("Invalid type {} for self.back_color".format(
-                    type(back_color)
-                ))
+            elif back_color is None:
+                return getattr(term, color)
         elif isinstance(color, int):
             return term.on_color(color)
         else:
@@ -273,5 +269,6 @@ class Bar(object):
             amount_complete_str,
         ])
 
+        self._term.clear_bol()
         self._term.stream.write(full_str)
         self._term.stream.flush()
