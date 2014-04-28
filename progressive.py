@@ -27,6 +27,10 @@ class Bar(object):
     `MIT <http://opensource.org/licenses/MIT>`_
     `nose-progressive/noseprogressive/bar.py <https://github.com/erikrose/nose-progressive/blob/master/noseprogressive/bar.py>`_
 
+    Terminal with 256 colors is recommended. See
+        `this <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`_ for Ubuntu
+        installation as an example.
+
     :type  term: blessings.Terminal()
     :param term: blessings.Terminal instance for the terminal of display
     :type  max_value: int
@@ -74,8 +78,8 @@ class Bar(object):
 
     def __init__(self, term, max_value=100, width="25%", title_pos="left",
                  title="Progress", num_rep="fraction", indent=0,
-                 filled_color="cyan",
-                 empty_color="white", back_color=None,
+                 filled_color=10,
+                 empty_color=240, back_color=None,
                  filled_char=u' ', empty_char=u' ',
                  start_char=u'', end_char=u'', fallback=False,
                  fallback_empty_char=u'◯', fallback_filled_char=u'◉'):
