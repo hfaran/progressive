@@ -1,13 +1,21 @@
 # -*- coding: utf-8 -*-
 
+from __future__ import division
 
-import types
 from signal import signal, SIGWINCH
-from ensure import check
+from math import floor
 
 
-class ColorUnsupportedError(StandardError):
+class ColorUnsupportedError(Exception):
     """Color is not supported by terminal"""
+
+
+def ensure(expr, exc, *args, **kwargs):
+    """
+    :raises ``exc``: With ``*args`` and ``**kwargs`` if not ``expr``
+    """
+    if not expr:
+        raise exc(*args, **kwargs)
 
 
 class Bar(object):
@@ -21,8 +29,23 @@ class Bar(object):
 
     :type  term: blessings.Terminal()
     :param term: blessings.Terminal instance for the terminal of display
-    :type  max: int
-    :param max: The capacity of the bar, i.e., ``index/max_value``
+    :type  max_value: int
+    :param max_value: The capacity of the bar, i.e., ``index/max_value``
+    :type  width: str
+    :param width: Must be of format {num: int}{unit: c|%}. Unit "c"
+        can be used to specify number of maximum columns; unit "%".
+        to specify percentage of the total terminal width to use.
+        e.g., "20c", "25%", etc.
+    :type  title_pos: str
+    :param title_pos: Position of title relative to the progress bar;
+        can be any one of ["left", "right", "above", "below"]
+    :type  title: str
+    :param title: Title of the progress bar
+    :type  num_rep: str
+    :param num_rep: Numeric representation of completion;
+        can be one of ["fraction", "percentage"]
+    :type  indent: int
+    :param indent: Spaces to indent the bar from the left-hand side
     :type  filled_color: str|int
     :param filled_color: color of the ``filled_char``; can be a string
         of the color's name or number representing the color; see the
@@ -49,16 +72,28 @@ class Bar(object):
         that works on terminals with no color support
     """
 
-    def __init__(self, term, max_value=100, filled_color="cyan",
+    def __init__(self, term, max_value=100, width="25%", title_pos="left",
+                 title="Progress", num_rep="fraction", indent=0,
+                 filled_color="cyan",
                  empty_color="white", back_color=None,
                  filled_char=u' ', empty_char=u' ',
                  start_char=u'', end_char=u'', fallback=False,
                  fallback_empty_char=u'◯', fallback_filled_char=u'◉'):
         self._term = term
         self._measure_terminal()
-        self.stream = term.stream
 
+        self._width_str = width
         self.max_value = max_value
+        self._value = 0
+
+        ensure(title_pos in ["left", "right", "above", "below"], ValueError)
+        self.title_pos = title_pos
+        self.title = title
+        ensure(num_rep in ["fraction", "percentage"], ValueError)
+        self.num_rep = num_rep
+        ensure(indent < self.columns, ValueError)
+        self.indent = indent
+
         self.start_char = start_char
         self.end_char = end_char
 
@@ -109,13 +144,11 @@ class Bar(object):
             try:
                 if isinstance(color, str):
                     req_colors = 16 if "bright" in color else 8
-                    check(term.number_of_colors
-                    ).is_greater_than_or_equal_to(
-                        req_colors).or_raise(ColorUnsupportedError, color)
+                    ensure(term.number_of_colors >= req_colors,
+                           ColorUnsupportedError, color)
                 elif isinstance(color, int):
-                    check(term.number_of_colors
-                    ).is_greater_than_or_equal_to(
-                        color).or_raise(ColorUnsupportedError, color)
+                    ensure(term.number_of_colors >= color,
+                           ColorUnsupportedError, color)
             except ColorUnsupportedError as e:
                 if raise_err:
                     raise e
@@ -123,7 +156,6 @@ class Bar(object):
                     return False
         else:
             return True
-
 
     @staticmethod
     def _get_format_callable(term, color, back_color):
@@ -139,7 +171,7 @@ class Bar(object):
         """
         if isinstance(color, str):
             assert any(isinstance(back_color,
-                                  t) for t in [str, types.NoneType])
+                                  t) for t in [str, type(None)])
             if back_color:
                 return getattr(term, color)
             elif back_color is None:
@@ -160,8 +192,7 @@ class Bar(object):
     def _handle_winch(self, *args):
         # self.erase()  # Doesn't seem to help.
         self._measure_terminal()
-        # TODO: Reprint the bar but at the new width.
-
+        self.draw()
 
     def _measure_terminal(self):
         self.lines, self.columns = (
@@ -174,9 +205,73 @@ class Bar(object):
     ##################
 
     @property
+    def max_width(self):
+        """
+        :rtype: int
+        :returns: Maximum column width of progress bar
+        """
+        value, unit = float(self._width_str[:-1]), self._width_str[-1]
+
+        ensure(unit in ["c", "%"], ValueError,
+               "Width unit must be either 'c' or '%'")
+
+        if unit == "c":
+            ensure(value <= self.columns, ValueError)
+            retval = value
+        else:  # unit == "%"
+            ensure(0 < value <= 100, ValueError)
+            dec = value / 100
+            retval = dec * self.columns
+
+        return int(floor(retval))
+
+    @property
     def filled(self):
+        """
+        :rtype: callable
+        """
         return self._filled
 
     @property
     def empty(self):
+        """
+        :rtype: callable
+        """
         return self._empty
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        self._value = val
+
+    def draw(self):
+        amount_complete = self.value / self.max_value
+        fill_amount = int(floor(amount_complete * self.max_width))
+        empty_amount = self.max_width - fill_amount
+
+        # '10/20' if 'fraction' or '50%' if 'percentage'
+        amount_complete_str = (
+            "{}/{}".format(self.value, self.max_value)
+            if self.num_rep == "fraction" else
+            "{}%".format(int(floor(amount_complete * 100)))
+        )
+
+        bar_str = ''.join([
+            # str() casting for type-hinting
+            str(self.filled(self._filled_char * fill_amount)),
+            str(self.empty(self._empty_char * empty_amount)),
+        ])
+
+        full_str = ' '.join([
+            " " * self.indent,
+            self.title if self.title_pos == "left" else "",
+            bar_str,
+            self.title if self.title_pos == "right" else "",
+            amount_complete_str,
+        ])
+
+        self._term.stream.write(full_str)
+        self._term.stream.flush()
