@@ -275,14 +275,16 @@ class Bar(object):
             u"{}%".format(int(floor(amount_complete * 100)))
         )
 
-        bar_str = ''
+        # Write title if supposed to be above
         if self.title_pos == "above":
-            bar_str += u"{}{}\n".format(
+            title_str = u"{}{}\n".format(
                 " " * self.indent,
                 self.title,
             )
+            self._term.stream.write(title_str)
+
         # Construct just the progress bar
-        bar_str += u''.join([
+        bar_str = u''.join([
             # str() casting for type-hinting
             unicode(self.filled(self._filled_char * fill_amount)),
             unicode(self.empty(self._empty_char * empty_amount)),
@@ -300,7 +302,13 @@ class Bar(object):
         bar_str = u"{} {}".format(bar_str, amount_complete_str)
         # Set back to normal after printing
         bar_str = u"{}{}".format(bar_str, self._term.normal)
-
-        # Write and flush
+        # Finally, write the completed bar_str
         self._term.stream.write(bar_str)
-        #self._term.stream.flush()
+
+        # Write title if supposed to be below
+        if self.title_pos == "below":
+            title_str = u"\n{}{}".format(
+                " " * self.indent,
+                self.title,
+            )
+            self._term.stream.write(title_str)

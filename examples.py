@@ -50,8 +50,10 @@ def progressive_example():
     from curses import tigetstr
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, indent=4, title_pos="left", fallback=True)
+    b = Bar(term, max_value=10, indent=4, title_pos="above", fallback=True)
 
+    # For some reason; a clear is required before running
+    #   as cursor fails to restore properly otherwise =/
     for i in range(11):
         sleep(1 * random.random())
         # This context manager is equivalent to using:
