@@ -49,14 +49,17 @@ def progressive_example():
     from progressive import Bar
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, indent=4, title_pos="left")
+    b = Bar(term, max_value=10, indent=0, title_pos="left")
 
     for i in range(11):
         sleep(1 * random.random())
-        t.stream.write(t.save)
-        b.value = i
-        b.draw()
-        t.stream.write(t.restore)
+        # This context manager is equivalent to using:
+        # t.stream.write(t.save)
+        # ...
+        # t.stream.write(t.restore)
+        with t.location():
+            b.value = i
+            b.draw()
     print(t.normal)
 
 
