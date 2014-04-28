@@ -49,8 +49,7 @@ def progressive_example():
     from progressive import Bar
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, filled_color=10, empty_color=240,
-            back_color=None)
+    b = Bar(term, max_value=10, indent=0)
 
     for i in range(11):
         sleep(1 * random.random())

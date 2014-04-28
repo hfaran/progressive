@@ -259,20 +259,24 @@ class Bar(object):
             "{}%".format(int(floor(amount_complete * 100)))
         )
 
+        # Construct just the progress bar
         bar_str = ''.join([
             # str() casting for type-hinting
             str(self.filled(self._filled_char * fill_amount)),
             str(self.empty(self._empty_char * empty_amount)),
         ])
+        # Wrap with start and end character
+        bar_str = "{}{}{}".format(self.start_char, bar_str, self.end_char)
+        # Add on title if supposed to be on left or right
+        if self.title_pos == "left":
+            bar_str = "{} {}".format(self.title, bar_str)
+        elif self.title_pos == "right":
+            bar_str = "{} {}".format(bar_str, self.title)
+        # Add return character and indent
+        bar_str = ''.join(["\r", " " * self.indent, bar_str])
+        # Add complete percentage of fraction
+        bar_str = "{} {}".format(bar_str, amount_complete_str)
 
-        full_str = ' '.join([
-            " " * self.indent,
-            self.title if self.title_pos == "left" else "",
-            bar_str,
-            self.title if self.title_pos == "right" else "",
-            amount_complete_str,
-        ])
-
-        self._term.clear_bol()
-        self._term.stream.write(full_str)
+        # Write and flush
+        self._term.stream.write(bar_str)
         self._term.stream.flush()
