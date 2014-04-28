@@ -205,7 +205,8 @@ class Bar(object):
 
     @property
     def max_width(self):
-        """
+        """Get maximum width of progress bar
+
         :rtype: int
         :returns: Maximum column width of progress bar
         """
@@ -229,27 +230,32 @@ class Bar(object):
 
     @property
     def filled(self):
-        """
+        """Callable for drawing filled portion of progress bar
+
         :rtype: callable
         """
         return self._filled
 
     @property
     def empty(self):
-        """
+        """Callable for drawing empty portion of progress bar
+
         :rtype: callable
         """
         return self._empty
 
     @property
     def value(self):
+        """Get amount currently complete"""
         return self._value
 
     @value.setter
     def value(self, val):
+        """Set amount currently complete"""
         self._value = val
 
     def draw(self):
+        """Draw the progress bar"""
         # This is essentially winch-handling without having
         #   to do winch-handling; cleanly redrawing on winch is difficult
         #   and out of the intended scope of this class; we CAN
@@ -262,7 +268,7 @@ class Bar(object):
         fill_amount = int(floor(amount_complete * self.max_width))
         empty_amount = self.max_width - fill_amount
 
-        # '10/20' if 'fraction' or '50%' if 'percentage'
+        # e.g., '10/20' if 'fraction' or '50%' if 'percentage'
         amount_complete_str = (
             "{}/{}".format(self.value, self.max_value)
             if self.num_rep == "fraction" else
@@ -286,6 +292,8 @@ class Bar(object):
         bar_str = ''.join([" " * self.indent, bar_str])
         # Add complete percentage of fraction
         bar_str = "{} {}".format(bar_str, amount_complete_str)
+        # Set back to normal after printing
+        bar_str = "{}{}".format(bar_str, self._term.normal)
 
         # Write and flush
         self._term.stream.write(bar_str)
