@@ -13,7 +13,7 @@ class ColorUnsupportedError(StandardError):
 class Bar(object):
     """Progress Bar with blessings
 
-    Many parts of this class are thanks to Erik Rose's implementation
+    Several parts of this class are thanks to Erik Rose's implementation
     of ``ProgressBar`` in ``nose-progressive``, licensed under
     The MIT License.
     `MIT <http://opensource.org/licenses/MIT>`_
@@ -55,29 +55,37 @@ class Bar(object):
                  start_char=u'', end_char=u'', fallback=False,
                  fallback_empty_char=u'◯', fallback_filled_char=u'◉'):
         self._term = term
+        self._measure_terminal()
         self.stream = term.stream
+
         self.max_value = max_value
-
-        # Setup callables and characters depending on if terminal has
-        #   has color support
-        self._has_color = self._check_has_color(term, filled_color, empty_color)
-        if self._has_color:
-            self._filled_char = filled_char
-            self._empty_char = empty_char
-            self._filled = self._get_format_callable(term, filled_color, back_color)
-            self._empty = self._get_format_callable(term, empty_color, back_color)
-        else:
-            if fallback:
-                self._empty_char = fallback_empty_char
-                self._filled_char = fallback_filled_char
-                self._filled = self._empty = lambda s: s
-            else:
-                raise ColorUnsupportedError
-
         self.start_char = start_char
         self.end_char = end_char
 
-        self._measure_terminal()
+        # Setup callables and characters depending on if terminal has
+        #   has color support
+        supports_colors = self._supports_colors(
+            term=term,
+            raise_err=not fallback,
+            colors=(filled_color, empty_color)
+        )
+        if supports_colors:
+            self._filled_char = filled_char
+            self._empty_char = empty_char
+            self._filled = self._get_format_callable(
+                term=term,
+                color=filled_color,
+                back_color=back_color
+            )
+            self._empty = self._get_format_callable(
+                term=term,
+                color=empty_color,
+                back_color=back_color
+            )
+        else:
+            self._empty_char = fallback_empty_char
+            self._filled_char = fallback_filled_char
+            self._filled = self._empty = lambda s: s
 
         # Handle window resize
         signal(SIGWINCH, self._handle_winch)
@@ -87,26 +95,48 @@ class Bar(object):
     ###################
 
     @staticmethod
-    def _check_has_color(term, filled_color, empty_color):
-        try:
-            for color in [filled_color, empty_color]:
+    def _supports_colors(term, raise_err, colors):
+        """Check if ``term`` supports ``colors``
+
+        :raises ColorUnsupportedError: This is raised if ``raise_err``
+            is ``False`` and a color in ``colors`` is unsupported by ``term``
+        :type raise_err: bool
+        :param raise_err: Set to ``False`` to return a ``bool`` indicating
+            color support rather than raising ColorUnsupportedError
+        :type  colors: [str, ...]
+        """
+        for color in colors:
+            try:
                 if isinstance(color, str):
                     req_colors = 16 if "bright" in color else 8
                     check(term.number_of_colors
                     ).is_greater_than_or_equal_to(
-                        req_colors).or_raise(ColorUnsupportedError)
+                        req_colors).or_raise(ColorUnsupportedError, color)
                 elif isinstance(color, int):
                     check(term.number_of_colors
                     ).is_greater_than_or_equal_to(
-                        color).or_raise(ColorUnsupportedError)
-            else:
-                return True
-        except ColorUnsupportedError:
-            return False
+                        color).or_raise(ColorUnsupportedError, color)
+            except ColorUnsupportedError as e:
+                if raise_err:
+                    raise e
+                else:
+                    return False
+        else:
+            return True
+
 
     @staticmethod
     def _get_format_callable(term, color, back_color):
-        """Get blessings.Terminal() callable"""
+        """Get string-coloring callable
+
+        Get callable for string output using ``color`` on ``back_color``
+            on ``term``
+
+        :param term: blessings.Terminal instance
+        :param color: Color that callable will color the string it's passed
+        :param back_color: Back color for the string
+        :returns: callable(s: str) -> str
+        """
         if isinstance(color, str):
             assert any(isinstance(back_color,
                                   t) for t in [str, types.NoneType])
