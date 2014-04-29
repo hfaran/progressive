@@ -2,19 +2,8 @@
 
 from __future__ import division
 
-from math import floor
-
-
-class ColorUnsupportedError(Exception):
-    """Color is not supported by terminal"""
-
-
-def ensure(expr, exc, *args, **kwargs):
-    """
-    :raises ``exc``: With ``*args`` and ``**kwargs`` if not ``expr``
-    """
-    if not expr:
-        raise exc(*args, **kwargs)
+from progressive.util import floor, ensure
+from progressive.exceptions import ColorUnsupportedError
 
 
 class Bar(object):
