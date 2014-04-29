@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from __future__ import division
+from __future__ import unicode_literals
 
-from progressive.util import floor, ensure
+from progressive.util import floor, ensure, u
 from progressive.exceptions import ColorUnsupportedError
 
 
@@ -274,9 +275,8 @@ class Bar(object):
 
         # Construct just the progress bar
         bar_str = u''.join([
-            # str() casting for type-hinting
-            unicode(self.filled(self._filled_char * fill_amount)),
-            unicode(self.empty(self._empty_char * empty_amount)),
+            u(self.filled(self._filled_char * fill_amount)),
+            u(self.empty(self._empty_char * empty_amount)),
         ])
         # Wrap with start and end character
         bar_str = u"{}{}{}".format(self.start_char, bar_str, self.end_char)

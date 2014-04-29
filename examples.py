@@ -46,7 +46,7 @@ def blessings_progress_example():
 
 def progressive_example():
     from blessings import Terminal
-    from progressive import Bar
+    from progressive.bar import Bar
 
     t = term = Terminal()
     b = Bar(term, max_value=10, indent=0, title_pos="above", fallback=True)
