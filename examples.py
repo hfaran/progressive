@@ -49,17 +49,32 @@ def progressive_example():
     from progressive import Bar
 
     t = term = Terminal()
-    b = Bar(term, max_value=10, indent=0, title_pos="left")
+    b = Bar(term, max_value=10, indent=0, title_pos="above", fallback=True)
+    b1 = Bar(term, max_value=10, indent=4, title_pos="above", fallback=True)
 
+    # For some reason; a clear is required before running
+    #   as cursor fails to restore properly otherwise =/
     for i in range(11):
         sleep(1 * random.random())
-        # This context manager is equivalent to using:
-        # t.stream.write(t.save)
-        # ...
-        # t.stream.write(t.restore)
-        with t.location():
-            b.value = i
-            b.draw()
+
+        t.stream.write(t.save)
+
+        b.value = i
+        b1.value = i
+
+        b.draw()
+        t.stream.write(t.move_down)
+        t.stream.write(t.clear_bol)
+
+        b1.draw()
+        t.stream.write(t.move_down)
+        t.stream.write(t.clear_bol)
+
+        if i != 10:
+            t.stream.write(t.restore)
+
+        t.stream.flush()
+
     print(t.normal)
 
 
@@ -68,4 +83,3 @@ if __name__ == "__main__":
     #clint_progress_example()
     #progress_progress_example()
     #blessings_progress_example()
-
