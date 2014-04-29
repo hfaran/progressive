@@ -23,7 +23,7 @@ class Bar(object):
     :type  term: blessings.Terminal()
     :param term: blessings.Terminal instance for the terminal of display
     :type  max_value: int
-    :param max_value: The capacity of the bar, i.e., ``index/max_value``
+    :param max_value: The capacity of the bar, i.e., ``value/max_value``
     :type  width: str
     :param width: Must be of format {num: int}{unit: c|%}. Unit "c"
         can be used to specify number of maximum columns; unit "%".
@@ -76,22 +76,22 @@ class Bar(object):
         self._measure_terminal()
 
         self._width_str = width
-        self.max_value = max_value
+        self._max_value = max_value
         self._value = 0
 
         ensure(title_pos in ["left", "right", "above", "below"], ValueError,
                "Invalid choice for title position.")
-        self.title_pos = title_pos
-        self.title = title
+        self._title_pos = title_pos
+        self._title = title
         ensure(num_rep in ["fraction", "percentage"], ValueError,
                "num_rep must be either 'fraction' or 'percentage'.")
-        self.num_rep = num_rep
+        self._num_rep = num_rep
         ensure(indent < self.columns, ValueError,
                "Indent must be smaller than terminal width.")
-        self.indent = indent
+        self._indent = indent
 
-        self.start_char = start_char
-        self.end_char = end_char
+        self._start_char = start_char
+        self._end_char = end_char
 
         # Setup callables and characters depending on if terminal has
         #   has color support
@@ -117,6 +117,96 @@ class Bar(object):
             self._empty_char = fallback_empty_char
             self._filled_char = fallback_filled_char
             self._filled = self._empty = lambda s: s
+
+    ######################
+    # Public Attributes #
+    ######################
+
+    @property
+    def max_width(self):
+        """Get maximum width of progress bar
+
+        :rtype: int
+        :returns: Maximum column width of progress bar
+        """
+        value, unit = float(self._width_str[:-1]), self._width_str[-1]
+
+        ensure(unit in ["c", "%"], ValueError,
+               "Width unit must be either 'c' or '%'")
+
+        if unit == "c":
+            ensure(value <= self.columns, ValueError,
+                   "Terminal only has {} columns, cannot draw "
+                   "bar of size {}.".format(self.columns, value))
+            retval = value
+        else:  # unit == "%"
+            ensure(0 < value <= 100, ValueError,
+                   "value=={} does not satisfy 0 < value <= 100".format(value))
+            dec = value / 100
+            retval = dec * self.columns
+
+        return int(floor(retval))
+
+    @property
+    def filled(self):
+        """Callable for drawing filled portion of progress bar
+
+        :rtype: callable
+        """
+        return self._filled
+
+    @property
+    def empty(self):
+        """Callable for drawing empty portion of progress bar
+
+        :rtype: callable
+        """
+        return self._empty
+
+    @property
+    def value(self):
+        """Progress value relative to ``max_value``"""
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        self._value = val
+
+    @property
+    def max_value(self):
+        """The capacity of the bar, i.e., ``value/max_value``"""
+        return self._max_value
+
+    @max_value.setter
+    def max_value(self, val):
+        self._max_value = val
+
+    @property
+    def title(self):
+        """Title of the progress bar"""
+        return self._title
+
+    @title.setter
+    def title(self, t):
+        self._title = t
+
+    @property
+    def start_char(self):
+        """Character at the start of the progress bar"""
+        return self._start_char
+
+    @start_char.setter
+    def start_char(self, c):
+        self._start_char = c
+
+    @property
+    def end_char(self):
+        """Character at the end of the progress bar"""
+        return self._end_char
+
+    @end_char.setter
+    def end_char(self, c):
+        self._end_char = c
 
     ###################
     # Private Methods #
@@ -193,62 +283,11 @@ class Bar(object):
     # Public Methods #
     ##################
 
-    @property
-    def max_width(self):
-        """Get maximum width of progress bar
-
-        :rtype: int
-        :returns: Maximum column width of progress bar
-        """
-        value, unit = float(self._width_str[:-1]), self._width_str[-1]
-
-        ensure(unit in ["c", "%"], ValueError,
-               "Width unit must be either 'c' or '%'")
-
-        if unit == "c":
-            ensure(value <= self.columns, ValueError,
-                   "Terminal only has {} columns, cannot draw "
-                   "bar of size {}.".format(self.columns, value))
-            retval = value
-        else:  # unit == "%"
-            ensure(0 < value <= 100, ValueError,
-                   "value=={} does not satisfy 0 < value <= 100".format(value))
-            dec = value / 100
-            retval = dec * self.columns
-
-        return int(floor(retval))
-
-    @property
-    def filled(self):
-        """Callable for drawing filled portion of progress bar
-
-        :rtype: callable
-        """
-        return self._filled
-
-    @property
-    def empty(self):
-        """Callable for drawing empty portion of progress bar
-
-        :rtype: callable
-        """
-        return self._empty
-
-    @property
-    def value(self):
-        """Get amount currently complete"""
-        return self._value
-
-    @value.setter
-    def value(self, val):
-        """Set amount currently complete"""
-        self._value = val
-
     def draw(self):
         """Draw the progress bar"""
         # This is essentially winch-handling without having
         #   to do winch-handling; cleanly redrawing on winch is difficult
-        #   and out of the intended scope of this class; we CAN
+        #   and out of the intended scope of this class; we *can*
         #   however, adjust the next draw to be proper by re-measuring
         #   the terminal since the code is mostly written dynamically
         #   and many attributes and dynamically calculated properties.
@@ -261,14 +300,14 @@ class Bar(object):
         # e.g., '10/20' if 'fraction' or '50%' if 'percentage'
         amount_complete_str = (
             u"{}/{}".format(self.value, self.max_value)
-            if self.num_rep == "fraction" else
+            if self._num_rep == "fraction" else
             u"{}%".format(int(floor(amount_complete * 100)))
         )
 
         # Write title if supposed to be above
-        if self.title_pos == "above":
+        if self._title_pos == "above":
             title_str = u"{}{}\n".format(
-                " " * self.indent,
+                " " * self._indent,
                 self.title,
             )
             self._term.stream.write(title_str)
@@ -281,13 +320,13 @@ class Bar(object):
         # Wrap with start and end character
         bar_str = u"{}{}{}".format(self.start_char, bar_str, self.end_char)
         # Add on title if supposed to be on left or right
-        if self.title_pos == "left":
+        if self._title_pos == "left":
             bar_str = u"{} {}".format(self.title, bar_str)
-        elif self.title_pos == "right":
+        elif self._title_pos == "right":
             bar_str = u"{} {}".format(bar_str, self.title)
         # Add indent
-        bar_str = u''.join([" " * self.indent, bar_str])
-        # Add complete percentage of fraction
+        bar_str = u''.join([" " * self._indent, bar_str])
+        # Add complete percentage or fraction
         bar_str = u"{} {}".format(bar_str, amount_complete_str)
         # Set back to normal after printing
         bar_str = u"{}{}".format(bar_str, self._term.normal)
@@ -295,9 +334,9 @@ class Bar(object):
         self._term.stream.write(bar_str)
 
         # Write title if supposed to be below
-        if self.title_pos == "below":
+        if self._title_pos == "below":
             title_str = u"\n{}{}".format(
-                " " * self.indent,
+                " " * self._indent,
                 self.title,
             )
             self._term.stream.write(title_str)
