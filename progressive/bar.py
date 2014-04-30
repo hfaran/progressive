@@ -65,7 +65,7 @@ class Bar(object):
         that works on terminals with no color support
     """
 
-    def __init__(self, term, max_value=100, width="50%", title_pos="left",
+    def __init__(self, term, max_value=100, width="25%", title_pos="left",
                  title="Progress", num_rep="fraction", indent=0,
                  filled_color=10,
                  empty_color=240, back_color=None,

@@ -19,7 +19,7 @@ def simple_two_bar_example():
 
     Usage: `python -c "import examples; examples.simple_two_bar_example()"`
     """
-    MAX_VALUE = 10
+    MAX_VALUE = 100
     LINES_REQUIRED = 4
 
     # Create blessings.Terminal instance
@@ -42,7 +42,7 @@ def simple_two_bar_example():
         t.stream.write(t.move_up)
 
     for i in range(MAX_VALUE + 1):
-        sleep(1 * random.random())
+        sleep(0.1 * random.random())
 
         # Before beginning to draw our bars, we save the position
         #   of our cursor so we can restore back to this position after writing
