@@ -127,6 +127,12 @@ class Bar(object):
             self._filled_char = fallback_filled_char
             self._filled = self._empty = lambda s: s
 
+        ensure(self.full_line_width <= self.columns, WidthOverflowError,
+               "Attempting to initialize Bar with full_line_width {}; "
+               "terminal has width of only {}.".format(
+                    self.full_line_width, self.columns)
+               )
+
     ######################
     # Public Attributes #
     ######################
@@ -155,6 +161,24 @@ class Bar(object):
             retval = dec * self.columns
 
         return floor(retval)
+
+    @property
+    def full_line_width(self):
+        """Find actual length of bar_str
+
+        e.g., Progress [    |     ] 10/10
+        """
+        bar_str_len = sum([
+            self._indent,
+            ((len(self.title) + 1) if self._title_pos in ["left", "right"]
+             else 0),  # Title if present
+            len(self.start_char),
+            self.max_width,  # Progress bar
+            len(self.end_char),
+            1,  # Space between end_char and amount_complete_str
+            len(str(self.max_value))*2 + 1  # 100/100
+        ])
+        return bar_str_len
 
     @property
     def filled(self):
@@ -289,7 +313,7 @@ class Bar(object):
         :param flush: Set this to flush the terminal stream after writing
         :param ignore_overflow: Set this to ignore if s will exceed
             the terminal's width
-        :param err_msg: The error message given to WidthOverflowException
+        :param err_msg: The error message given to WidthOverflowError
             if it is triggered
         """
         stream = self._term.stream
@@ -336,19 +360,6 @@ class Bar(object):
             u"{}%".format(int(floor(amount_complete * 100)))
         )
 
-        # Find actual length of bar_str, e.g.,
-        #    Progress [    |     ] 10/10
-        bar_str_len = sum([
-            self._indent,
-            ((len(self.title) + 1) if self._title_pos in ["left", "right"]
-             else 0),  # Title if present
-            len(self.start_char),
-            self.max_width,  # Progress bar
-            len(self.end_char),
-            1,  # Space between end_char and amount_complete_str
-            len(str(self.max_value))*2 + 1  # 100/100
-        ])
-
         # Write title if supposed to be above
         if self._title_pos == "above":
             title_str = u"{}{}\n".format(
@@ -376,7 +387,7 @@ class Bar(object):
         # Set back to normal after printing
         bar_str = u"{}{}".format(bar_str, self._term.normal)
         # Finally, write the completed bar_str
-        self._write(bar_str, s_length=bar_str_len)
+        self._write(bar_str, s_length=self.full_line_width)
 
         # Write title if supposed to be below
         if self._title_pos == "below":
