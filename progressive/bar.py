@@ -65,7 +65,7 @@ class Bar(object):
         that works on terminals with no color support
     """
 
-    def __init__(self, term, max_value=100, width="33%", title_pos="left",
+    def __init__(self, term, max_value=100, width="50%", title_pos="left",
                  title="Progress", num_rep="fraction", indent=0,
                  filled_color=10,
                  empty_color=240, back_color=None,
@@ -144,7 +144,7 @@ class Bar(object):
             dec = value / 100
             retval = dec * self.columns
 
-        return int(floor(retval))
+        return floor(retval)
 
     @property
     def filled(self):
@@ -269,12 +269,13 @@ class Bar(object):
             self._term.width or 80
         )
 
-    def _write(self, s, flush=False, ignore_overflow=False,
+    def _write(self, s, s_length=None, flush=False, ignore_overflow=False,
                err_msg=None):
         """Write ``s``
 
         :type  s: str|unicode
         :param s: String to write
+        :param s_length: Custom length of ``s``
         :param flush: Set this to flush the terminal stream after writing
         :param ignore_overflow: Set this to ignore if s will exceed
             the terminal's width
@@ -284,12 +285,14 @@ class Bar(object):
         stream = self._term.stream
 
         if not ignore_overflow:
+            s_length = len(s) if s_length is None else s_length
             if err_msg is None:
                 err_msg = (
                     "Terminal has {} columns; attempted to write "
-                    "a string of length {}.".format(self.columns, len(s))
+                    "a string {} of length {}.".format(
+                        self.columns, repr(s), s_length)
                 )
-            ensure(len(s) < self.columns, WidthOverflowError, err_msg)
+            ensure(s_length <= self.columns, WidthOverflowError, err_msg)
         stream.write(s)
         if flush:
             stream.flush()
@@ -323,6 +326,19 @@ class Bar(object):
             u"{}%".format(int(floor(amount_complete * 100)))
         )
 
+        # Find actual length of bar_str, e.g.,
+        #    Progress [    |     ] 10/10
+        bar_str_len = sum([
+            self._indent,
+            ((len(self.title) + 1) if self._title_pos in ["left", "right"]
+             else 0),  # Title if present
+            len(self.start_char),
+            self.max_width,  # Progress bar
+            len(self.end_char),
+            1,  # Space between end_char and amount_complete_str
+            len(str(self.max_value))*2 + 1  # 100/100
+        ])
+
         # Write title if supposed to be above
         if self._title_pos == "above":
             title_str = u"{}{}\n".format(
@@ -350,7 +366,7 @@ class Bar(object):
         # Set back to normal after printing
         bar_str = u"{}{}".format(bar_str, self._term.normal)
         # Finally, write the completed bar_str
-        self._write(bar_str)
+        self._write(bar_str, s_length=bar_str_len)
 
         # Write title if supposed to be below
         if self._title_pos == "below":
