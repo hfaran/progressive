@@ -62,16 +62,23 @@ class Bar(object):
     :type  fallback: bool
     :param fallback: If this is set, if the terminal does not support
         provided colors, this will fall back to plain formatting
-        that works on terminals with no color support
+        that works on terminals with no color support, using the
+        provided ``fallback_empty_char` and ``fallback_filled_char``
+    :type  force_color: bool|NoneType
+    :param force_color: ``True`` forces color to be used even if it
+        may not be supported by the terminal; ``False`` forces use of
+        the fallback formatting; ``None`` does not force anything
+        and allows automatic detection as usual.
     """
 
-    def __init__(self, term, max_value=100, width="25%", title_pos="left",
-                 title="Progress", num_rep="fraction", indent=0,
-                 filled_color=10,
-                 empty_color=240, back_color=None,
-                 filled_char=u' ', empty_char=u' ',
-                 start_char=u'', end_char=u'', fallback=False,
-                 fallback_empty_char=u'◯', fallback_filled_char=u'◉'):
+    def __init__(
+        self, term, max_value=100, width="25%", title_pos="left",
+        title="Progress", num_rep="fraction", indent=0, filled_color=10,
+        empty_color=240, back_color=None, filled_char=u' ',
+        empty_char=u' ', start_char=u'', end_char=u'', fallback=False,
+        fallback_empty_char=u'◯', fallback_filled_char=u'◉',
+        force_color=None
+    ):
         self._term = term
         self._measure_terminal()
 
@@ -94,11 +101,14 @@ class Bar(object):
 
         # Setup callables and characters depending on if terminal has
         #   has color support
-        supports_colors = self._supports_colors(
-            term=term,
-            raise_err=not fallback,
-            colors=(filled_color, empty_color)
-        )
+        if force_color is not None:
+            supports_colors = force_color
+        else:
+            supports_colors = self._supports_colors(
+                term=term,
+                raise_err=not fallback,
+                colors=(filled_color, empty_color)
+            )
         if supports_colors:
             self._filled_char = filled_char
             self._empty_char = empty_char
