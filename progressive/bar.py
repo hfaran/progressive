@@ -77,7 +77,6 @@ class Bar(object):
 
         self._width_str = width
         self._max_value = max_value
-        self._value = 0
 
         ensure(title_pos in ["left", "right", "above", "below"], ValueError,
                "Invalid choice for title position.")
@@ -162,15 +161,6 @@ class Bar(object):
         :rtype: callable
         """
         return self._empty
-
-    @property
-    def value(self):
-        """Progress value relative to ``max_value``"""
-        return self._value
-
-    @value.setter
-    def value(self, val):
-        self._value = val
 
     @property
     def max_value(self):
@@ -283,8 +273,12 @@ class Bar(object):
     # Public Methods #
     ##################
 
-    def draw(self):
-        """Draw the progress bar"""
+    def draw(self, value):
+        """Draw the progress bar
+
+        :type  value: int
+        :param value: Progress value relative to ``self.max_value``
+        """
         # This is essentially winch-handling without having
         #   to do winch-handling; cleanly redrawing on winch is difficult
         #   and out of the intended scope of this class; we *can*
@@ -293,13 +287,13 @@ class Bar(object):
         #   and many attributes and dynamically calculated properties.
         self._measure_terminal()
 
-        amount_complete = self.value / self.max_value
+        amount_complete = value / self.max_value
         fill_amount = int(floor(amount_complete * self.max_width))
         empty_amount = self.max_width - fill_amount
 
         # e.g., '10/20' if 'fraction' or '50%' if 'percentage'
         amount_complete_str = (
-            u"{}/{}".format(self.value, self.max_value)
+            u"{}/{}".format(value, self.max_value)
             if self._num_rep == "fraction" else
             u"{}%".format(int(floor(amount_complete * 100)))
         )

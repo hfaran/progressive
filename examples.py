@@ -48,18 +48,14 @@ def simple_two_bar_example():
         #   of our cursor so we can restore back to this position after writing
         t.stream.write(t.save)
 
-        # We update the value of both bars
-        bar1.value = i
-        bar2.value = i
-
         # Now we draw the first bar
-        bar1.draw()
+        bar1.draw(value=i)
         # The following two writes act as a newline
         t.stream.write(t.move_down)  # Move the cursor down a row
         t.stream.write(t.clear_bol)  # Clear to the beginning of the line
 
         # Do the same for the second bar
-        bar2.draw()
+        bar2.draw(value=i)
         t.stream.write(t.move_down)
         t.stream.write(t.clear_bol)
 
