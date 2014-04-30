@@ -4,7 +4,7 @@ from __future__ import division
 from __future__ import unicode_literals
 
 from progressive.util import floor, ensure, u
-from progressive.exceptions import ColorUnsupportedError
+from progressive.exceptions import ColorUnsupportedError, WidthOverflowError
 
 
 class Bar(object):
@@ -65,7 +65,7 @@ class Bar(object):
         that works on terminals with no color support
     """
 
-    def __init__(self, term, max_value=100, width="25%", title_pos="left",
+    def __init__(self, term, max_value=100, width="33%", title_pos="left",
                  title="Progress", num_rep="fraction", indent=0,
                  filled_color=10,
                  empty_color=240, back_color=None,
@@ -269,6 +269,31 @@ class Bar(object):
             self._term.width or 80
         )
 
+    def _write(self, s, flush=False, ignore_overflow=False,
+               err_msg=None):
+        """Write ``s``
+
+        :type  s: str|unicode
+        :param s: String to write
+        :param flush: Set this to flush the terminal stream after writing
+        :param ignore_overflow: Set this to ignore if s will exceed
+            the terminal's width
+        :param err_msg: The error message given to WidthOverflowException
+            if it is triggered
+        """
+        stream = self._term.stream
+
+        if not ignore_overflow:
+            if err_msg is None:
+                err_msg = (
+                    "Terminal has {} columns; attempted to write "
+                    "a string of length {}.".format(self.columns, len(s))
+                )
+            ensure(len(s) < self.columns, WidthOverflowError, err_msg)
+        stream.write(s)
+        if flush:
+            stream.flush()
+
     ##################
     # Public Methods #
     ##################
@@ -304,7 +329,7 @@ class Bar(object):
                 " " * self._indent,
                 self.title,
             )
-            self._term.stream.write(title_str)
+            self._write(title_str, ignore_overflow=True)
 
         # Construct just the progress bar
         bar_str = u''.join([
@@ -325,7 +350,7 @@ class Bar(object):
         # Set back to normal after printing
         bar_str = u"{}{}".format(bar_str, self._term.normal)
         # Finally, write the completed bar_str
-        self._term.stream.write(bar_str)
+        self._write(bar_str)
 
         # Write title if supposed to be below
         if self._title_pos == "below":
@@ -333,4 +358,4 @@ class Bar(object):
                 " " * self._indent,
                 self.title,
             )
-            self._term.stream.write(title_str)
+            self._write(title_str, ignore_overflow=True)
