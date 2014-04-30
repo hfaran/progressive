@@ -1,85 +1,73 @@
 # -*- coding: utf-8 -*-
-"""Examples for reference using clint, progress, and blessings"""
+"""Examples
 
+Usage:
+`python -c "import examples; examples.simple_two_bar_example()"`
+"""
 import random
 from time import sleep
+from blessings import Terminal
+
+from progressive.bar import Bar
 
 
-def clint_progress_example():
-    import clint
+def simple_two_bar_example():
+    """Two-bar example using just the Bar class
 
-    assert clint.textui.progress.BAR_TEMPLATE == '%s[%s%s] %i/%i - %s\r'
-    clint.textui.progress.BAR_TEMPLATE = '%s %s%s %i/%i - %s\r'
-    chars = (u'◯', u'◉')
-    # chars = (u' ', u'█')
+    This example is intended to show usage of the Bar class at the barest
+    level.
 
-    with clint.textui.progress.Bar(label="Job Progress", expected_size=100,
-                                   filled_char=chars[1], empty_char=chars[0]) as bar:
-        for val in map(lambda x: x * 10, range(11)):
-            sleep(1 * random.random())
-            bar.show(val)
+    Usage: `python -c "import examples; examples.simple_two_bar_example()"`
+    """
+    MAX_VALUE = 10
+    LINES_REQUIRED = 4
 
+    # Create blessings.Terminal instance
+    t = Terminal()
+    # Create our test progress bars
+    bar1 = Bar(t, max_value=MAX_VALUE, indent=0,
+               title_pos="above", fallback=True)
+    bar2 = Bar(t, max_value=MAX_VALUE, indent=4,
+               title_pos="above", fallback=True)
 
-def progress_progress_example():
-    from progress.bar import FillingCirclesBar
+    # Move the cursor down, then back up LINES_REQUIRED rows
+    # This is a very important step that ensures that the terminal
+    #   has enough room at the bottom for printing; if this step is not
+    #   the cursor will not be able to restore properly
+    # NOTE: Usually before doing this, you should make sure your terminal
+    #   actually has enough height to display all the bars you would like
+    for i in range(LINES_REQUIRED):
+        t.stream.write(t.move_down)
+    for i in range(LINES_REQUIRED):
+        t.stream.write(t.move_up)
 
-    bar = FillingCirclesBar("Job Progress", max=100)
-    for i in map(lambda x: x * 10, range(11)):
-        sleep(1 * random.random())
-        bar.index = i
-        bar.update()
-    bar.finish()
-
-
-def blessings_progress_example():
-    from blessings import Terminal
-
-    t = term = Terminal()
-
-    for i in range(11):
-        sleep(1 * random.random())
-        t.clear_bol()
-        term.stream.write(t.cyan_on_white(" " * i))
-        term.stream.flush()
-    print(t.normal)
-
-
-def progressive_example():
-    from blessings import Terminal
-    from progressive.bar import Bar
-
-    t = term = Terminal()
-    b = Bar(term, max_value=10, indent=0, title_pos="above", fallback=True)
-    b1 = Bar(term, max_value=10, indent=4, title_pos="above", fallback=True)
-
-    # For some reason; a clear is required before running
-    #   as cursor fails to restore properly otherwise =/
-    for i in range(11):
+    for i in range(MAX_VALUE + 1):
         sleep(1 * random.random())
 
+        # Before beginning to draw our bars, we save the position
+        #   of our cursor so we can restore back to this position after writing
         t.stream.write(t.save)
 
-        b.value = i
-        b1.value = i
+        # We update the value of both bars
+        bar1.value = i
+        bar2.value = i
 
-        b.draw()
+        # Now we draw the first bar
+        bar1.draw()
+        # The following two writes act as a newline
+        t.stream.write(t.move_down)  # Move the cursor down a row
+        t.stream.write(t.clear_bol)  # Clear to the beginning of the line
+
+        # Do the same for the second bar
+        bar2.draw()
         t.stream.write(t.move_down)
         t.stream.write(t.clear_bol)
 
-        b1.draw()
-        t.stream.write(t.move_down)
-        t.stream.write(t.clear_bol)
-
-        if i != 10:
+        # We're done writing, so time to restore the cursor to the top;
+        #   we do the restore for every iteration EXCEPT the last one
+        #   (the reason why, is left as an exercise for the reader)
+        if i < MAX_VALUE:
             t.stream.write(t.restore)
 
+        # Finally, we can flush all of this to stdout
         t.stream.flush()
-
-    print(t.normal)
-
-
-if __name__ == "__main__":
-    progressive_example()
-    #clint_progress_example()
-    #progress_progress_example()
-    #blessings_progress_example()
