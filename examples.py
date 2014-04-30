@@ -2,7 +2,7 @@
 """Examples
 
 Usage:
-`python -c "import examples; examples.simple_two_bar_example()"`
+`python -c "import examples; examples.simple_two_bar()"`
 """
 import random
 from time import sleep
@@ -11,7 +11,7 @@ from blessings import Terminal
 from progressive.bar import Bar
 
 
-def simple_two_bar_example():
+def simple_two_bar():
     """Two-bar example using just the Bar class
 
     This example is intended to show usage of the Bar class at the barest
