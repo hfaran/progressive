@@ -15,7 +15,7 @@ class NestedProgress(object):
         self.term = Terminal() if term is None else term
         self.indent = indent
 
-    def draw(self, obj):
+    def draw(self, obj, flush=True):
         obj = deepcopy(obj)
         # TODO: Automatically collapse hierarchy so something
         #   will always be displayable (well, unless the top-level)
@@ -26,6 +26,8 @@ class NestedProgress(object):
                "Terminal is not long enough to fit all bars.")
         self._calculate_values(obj)
         self._draw(obj)
+        if flush:
+            self.term.flush()
 
     def clear_lines(self, obj):
         lines_req = self.lines_required(obj)

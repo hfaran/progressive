@@ -13,29 +13,33 @@ from progressive.nest import NestedProgress
 
 
 def nested_progress():
+    """Example showing nested progress view"""
+
+    #############
+    # Test data #
+    #############
+
+    # For this example, we're obviously going to be feeding fictitious data
+    #   to NestedProgress, so here it is
     test_d = {
-        "Job1": {
-            "Task1": {
-                "SubTask1": 0,
-                "SubTask2": 0,
+        "Warp Jump": {
+            "1) Prepare fuel": {
+                "Load Tanks": {
+                    "Tank 1": 0,
+                    "Tank 2": 0,
+                },
+                "Refine tylium ore": 0,
             },
-            "Task2": {
-                "SubTask1": 0,
-                "SubTask2": 0,
+            "2) Calculate jump co-ordinates": {
+                "Resolve common name to co-ordinates": {
+                    "Querying resolution from baseship": 0,
+                },
             },
-        },
-        "Job2": {
-            "Task1": {
-                "SubTask1": 0,
-                "SubTask2": 0,
-            },
-            "Task2": {
-                "SubTask1": 0,
-                "SubTask2": 0,
-            },
+            "3) Check FTL drive readiness": 0
         }
     }
 
+    # We'll use this function to bump up the numbers
     def incr_value(obj):
         if isinstance(obj, dict):
             for k in obj:
@@ -44,27 +48,41 @@ def nested_progress():
                 elif isinstance(obj[k], int):
                     if obj[k] == 100:
                         pass
-                    elif obj[k] >= 97:
+                    elif obj[k] >= 91:
                         obj[k] = 100
                     else:
-                        obj[k] += random.choice(range(3))
+                        obj[k] += random.choice(range(10))
+
+    # And this to check if we're to stop drawing
+    def are_we_done(obj):
+        if isinstance(obj, dict):
+            return all(are_we_done(v) for v in obj.values())
+        elif isinstance(obj, int):
+            return True if obj == 100 else False
+
+    ###################
+    # The actual code #
+    ###################
 
     # Create blessings.Terminal instance
     t = Terminal()
+    # Initialize a NestedProgress instance
     n = NestedProgress(term=t)
+    # We'll use the clear_lines method to make sure the terminal
+    #   is filled out with all the room we need
     n.clear_lines(test_d)
 
+    # Before starting to write, save the cursor position so we can restore
+    #   back to it before writing again
     t.stream.write(t.save)
-    while 1:
-        sleep(0.1 * random.random())
+    while not are_we_done(test_d):
+        sleep(1.0 * random.random())
 
         t.stream.write(t.restore)
-
+        # We use our incr_value method to bump the fake numbers
         incr_value(test_d)
-
+        # Actually draw out the bars
         n.draw(test_d)
-
-        t.stream.flush()
 
 
 def two_bar():
