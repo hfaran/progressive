@@ -9,6 +9,7 @@ from time import sleep
 from blessings import Terminal
 
 from progressive.bar import Bar
+from progressive.nest import NestedProgress
 
 
 def simple_two_bar():
@@ -66,4 +67,59 @@ def simple_two_bar():
             t.stream.write(t.restore)
 
         # Finally, we can flush all of this to stdout
+        t.stream.flush()
+
+
+def nested_progress():
+    test_d = {
+        "Job1": {
+            "Task1": {
+                "SubTask1": 0,
+                "SubTask2": 0,
+            },
+            "Task2": {
+                "SubTask1": 0,
+                "SubTask2": 0,
+            },
+        },
+        "Job2": {
+            "Task1": {
+                "SubTask1": 0,
+                "SubTask2": 0,
+            },
+            "Task2": {
+                "SubTask1": 0,
+                "SubTask2": 0,
+            },
+        }
+    }
+
+    def incr_value(obj):
+        if isinstance(obj, dict):
+            for k in obj:
+                if isinstance(obj[k], dict):
+                    incr_value(obj[k])
+                elif isinstance(obj[k], int):
+                    if obj[k] == 100:
+                        pass
+                    elif obj[k] >= 97:
+                        obj[k] = 100
+                    else:
+                        obj[k] += random.choice(range(3))
+
+    # Create blessings.Terminal instance
+    t = Terminal()
+    n = NestedProgress(term=t)
+    n.clear_lines(test_d)
+
+    t.stream.write(t.save)
+    while 1:
+        sleep(0.1 * random.random())
+
+        t.stream.write(t.restore)
+
+        incr_value(test_d)
+
+        n.draw(test_d)
+
         t.stream.flush()
