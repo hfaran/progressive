@@ -9,7 +9,7 @@ from time import sleep
 from blessings import Terminal
 
 from progressive.bar import Bar
-from progressive.nest import NestedProgress
+from progressive.nest import NestedProgress, Value
 
 
 def nested_progress():
@@ -21,44 +21,39 @@ def nested_progress():
 
     # For this example, we're obviously going to be feeding fictitious data
     #   to NestedProgress, so here it is
+    vals = [Value(0) for i in range(5)]
+
     test_d = {
         "Warp Jump": {
             "1) Prepare fuel": {
                 "Load Tanks": {
-                    "Tank 1": 0,
-                    "Tank 2": 0,
+                    "Tank 1": vals[0],
+                    "Tank 2": vals[1],
                 },
-                "Refine tylium ore": 0,
+                "Refine tylium ore": vals[2],
             },
             "2) Calculate jump co-ordinates": {
                 "Resolve common name to co-ordinates": {
-                    "Querying resolution from baseship": 0,
+                    "Querying resolution from baseship": vals[3],
                 },
             },
-            "3) Check FTL drive readiness": 0
+            "3) Check FTL drive readiness": vals[4]
         }
     }
 
     # We'll use this function to bump up the numbers
     def incr_value(obj):
-        if isinstance(obj, dict):
-            for k in obj:
-                if isinstance(obj[k], dict):
-                    incr_value(obj[k])
-                elif isinstance(obj[k], int):
-                    if obj[k] == 100:
-                        pass
-                    elif obj[k] >= 91:
-                        obj[k] = 100
-                    else:
-                        obj[k] += random.choice(range(10))
+        for val in vals:
+            if val.value == 100:
+                pass
+            elif val.value >= 98:
+                val.value = 100
+            else:
+                val.value += random.choice(range(3))
 
     # And this to check if we're to stop drawing
     def are_we_done(obj):
-        if isinstance(obj, dict):
-            return all(are_we_done(v) for v in obj.values())
-        elif isinstance(obj, int):
-            return True if obj == 100 else False
+        return all(val.value==100 for val in vals)
 
     ###################
     # The actual code #
@@ -76,7 +71,7 @@ def nested_progress():
     #   back to it before writing again
     t.stream.write(t.save)
     while not are_we_done(test_d):
-        sleep(1.0 * random.random())
+        sleep(0.1 * random.random())
 
         t.stream.write(t.restore)
         # We use our incr_value method to bump the fake numbers

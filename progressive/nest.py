@@ -8,6 +8,11 @@ from progressive.util import floor, ensure
 from progressive.exceptions import LengthOverflowError
 
 
+class Value(object):
+    def __init__(self, value):
+        self.value = value
+
+
 class NestedProgress(object):
     """Nested progress"""
 
@@ -40,7 +45,7 @@ class NestedProgress(object):
         if isinstance(obj, dict):
             return sum(self.lines_required(v, count=count)
                        for v in obj.values()) + 2
-        elif isinstance(obj, int):
+        elif isinstance(obj, Value):
             return 2
 
     def _calculate_values(self, obj):
@@ -52,8 +57,8 @@ class NestedProgress(object):
                 obj[k] = (val, obj[k])
                 value += val
             return floor(value/items)
-        elif any(isinstance(obj, t) for t in [int, float]):
-            return floor(obj)
+        elif isinstance(obj, Value):
+            return floor(obj.value)
         else:
             raise TypeError("Unexpected type {}".format(type(obj)))
 
