@@ -9,7 +9,7 @@ from time import sleep
 from blessings import Terminal
 
 from progressive.bar import Bar
-from progressive.nest import NestedProgress, Value
+from progressive.nest import NestedProgress, Value, BarDescriptor
 
 
 def nested_progress():
@@ -27,17 +27,21 @@ def nested_progress():
         "Warp Jump": {
             "1) Prepare fuel": {
                 "Load Tanks": {
-                    "Tank 1": vals[0],
-                    "Tank 2": vals[1],
+                    "Tank 1": BarDescriptor(type=Bar, value=vals[0]),
+                    "Tank 2": BarDescriptor(type=Bar, value=vals[1]),
                 },
-                "Refine tylium ore": vals[2],
+                "Refine tylium ore": BarDescriptor(type=Bar, value=vals[2]),
             },
             "2) Calculate jump co-ordinates": {
                 "Resolve common name to co-ordinates": {
-                    "Querying resolution from baseship": vals[3],
+                    "Querying resolution from baseship": BarDescriptor(
+                        type=Bar, value=vals[3]
+                    ),
                 },
             },
-            "3) Check FTL drive readiness": vals[4]
+            "3) Check FTL drive readiness": BarDescriptor(
+                type=Bar, value=vals[4]
+            )
         }
     }
 
@@ -53,7 +57,7 @@ def nested_progress():
 
     # And this to check if we're to stop drawing
     def are_we_done(obj):
-        return all(val.value==100 for val in vals)
+        return all(val.value == 100 for val in vals)
 
     ###################
     # The actual code #

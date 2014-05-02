@@ -9,8 +9,13 @@ from progressive.exceptions import LengthOverflowError
 
 
 class Value(object):
+
     def __init__(self, value):
         self.value = value
+
+
+class BarDescriptor(dict):
+    """Bar descriptor"""
 
 
 class NestedProgress(object):
@@ -42,33 +47,51 @@ class NestedProgress(object):
             self.term.stream.write(self.term.move_up)
 
     def lines_required(self, obj, count=0):
-        if isinstance(obj, dict):
+        if all([
+            isinstance(obj, dict),
+            type(obj) != BarDescriptor
+        ]):
             return sum(self.lines_required(v, count=count)
                        for v in obj.values()) + 2
-        elif isinstance(obj, Value):
-            return 2
+        elif isinstance(obj, BarDescriptor):
+            if obj.get("kwargs", {}).get("title_pos") in ["left", "right"]:
+                return 1
+            else:
+                return 2
 
     def _calculate_values(self, obj):
-        if isinstance(obj, dict):
+        if all([
+            isinstance(obj, dict),
+            type(obj) != BarDescriptor
+        ]):
             items = len(obj)
             value = 0
             for k in obj:
-                val = self._calculate_values(obj[k])
-                obj[k] = (val, obj[k])
+                bar_desc = self._calculate_values(obj[k])
+                val = bar_desc["value"].value
+                obj[k] = (bar_desc, obj[k])
                 value += val
-            return floor(value/items)
-        elif isinstance(obj, Value):
-            return floor(obj.value)
+            return BarDescriptor(type=Bar, value=Value(floor(value / items)))
+        elif isinstance(obj, BarDescriptor):
+            return obj
         else:
             raise TypeError("Unexpected type {}".format(type(obj)))
 
     def _draw(self, obj, indent=0):
-        if isinstance(obj, dict):
+        if all([
+            isinstance(obj, dict),
+            type(obj) != BarDescriptor
+        ]):
             for k, v in sorted(obj.items()):
-                val, subdict = v[0], v[1]
-                b = Bar(self.term, title_pos="above", indent=indent, title=k)
-                b.draw(val)
+                bar_desc, subdict = v[0], v[1]
+
+                args = [self.term] + bar_desc.get("args", [])
+                kwargs = dict(title_pos="above", indent=indent, title=k)
+                kwargs.update(bar_desc.get("kwargs", {}))
+
+                b = Bar(*args, **kwargs)
+                b.draw(bar_desc["value"].value)
                 self.term.stream.write(self.term.move_down)
                 self.term.stream.write(self.term.clear_bol)
 
-                self._draw(subdict, indent=indent+self.indent)
+                self._draw(subdict, indent=indent + self.indent)
