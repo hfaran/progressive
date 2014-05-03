@@ -3,11 +3,12 @@
 from __future__ import division
 from __future__ import unicode_literals
 
+from progressive.cursor import Cursor
 from progressive.util import floor, ensure, u
 from progressive.exceptions import ColorUnsupportedError, WidthOverflowError
 
 
-class Bar(object):
+class Bar(Cursor):
     """Progress Bar with blessings
 
     Several parts of this class are thanks to Erik Rose's implementation
@@ -79,7 +80,8 @@ class Bar(object):
             fallback_empty_char=u'◯', fallback_filled_char=u'◉',
             force_color=None
     ):
-        self._term = term
+        Cursor.__init__(self, term)
+
         self._measure_terminal()
 
         self._width_str = width
@@ -299,8 +301,8 @@ class Bar(object):
 
     def _measure_terminal(self):
         self.lines, self.columns = (
-            self._term.height or 24,
-            self._term.width or 80
+            self.term.height or 24,
+            self.term.width or 80
         )
 
     def _write(self, s, s_length=None, flush=False, ignore_overflow=False,
@@ -316,7 +318,7 @@ class Bar(object):
         :param err_msg: The error message given to WidthOverflowError
             if it is triggered
         """
-        stream = self._term.stream
+        stream = self.term.stream
 
         if not ignore_overflow:
             s_length = len(s) if s_length is None else s_length
@@ -385,7 +387,7 @@ class Bar(object):
         # Add complete percentage or fraction
         bar_str = u"{} {}".format(bar_str, amount_complete_str)
         # Set back to normal after printing
-        bar_str = u"{}{}".format(bar_str, self._term.normal)
+        bar_str = u"{}{}".format(bar_str, self.term.normal)
         # Finally, write the completed bar_str
         self._write(bar_str, s_length=self.full_line_width)
 

@@ -5,6 +5,7 @@ from copy import deepcopy
 from blessings import Terminal
 
 from progressive.bar import Bar
+from progressive.cursor import Cursor
 from progressive.util import floor, ensure
 from progressive.exceptions import LengthOverflowError
 
@@ -52,7 +53,7 @@ class BarDescriptor(dict):
     """
 
 
-class TreeProgress(object):
+class TreeProgress(Cursor):
     """Progress display for trees
 
     For drawing a hierarchical progress view from a tree
@@ -64,9 +65,8 @@ class TreeProgress(object):
     """
 
     def __init__(self, term=None, indent=4):
-        self.term = Terminal() if term is None else term
+        Cursor.__init__(self, term)
         self.indent = indent
-        self._saved = False
 
     ##################
     # Public Methods #
@@ -102,24 +102,6 @@ class TreeProgress(object):
         self._draw(tree)
         if flush:
             self.term.flush()
-
-    def save(self):
-        """Saves current cursor position, so that it can be restored later"""
-        self.term.stream.write(self.term.save)
-        self._saved = True
-
-    def restore(self):
-        """Restores cursor to the previously saved location
-
-        This is useful after calling TreeProgress.draw(..., save_cursor=True)
-            to restore the cursor to the position it was in before drawing,
-            before drawing again.
-
-        Cursor position will only be restored IF it was previously saved
-            by this TreeProgress instance (and not by any external force)
-        """
-        if self._saved:
-            self.term.stream.write(self.term.restore)
 
     def clear_lines(self, tree):
         """Clear lines in terminal below current cursor position as required
