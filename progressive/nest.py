@@ -32,8 +32,12 @@ class BarDescriptor(dict):
     To be used in leaf of a tree describing a hierarchy for ``NestedProgress``,
     e.g.,:
 
-        tree = {"Job": {"Task1": BarDescriptor(...)}, {"Task2":
-        BarDescriptor(...)}}
+        tree = {"Job":
+            {"Task1": BarDescriptor(...)},
+            {"Task2":
+                {"Subtask1": BarDescriptor(...)},
+            },
+        }
 
     :type  type: Bar|subclass of Bar
     :param type: The type of Bar to use to display that leaf
@@ -61,64 +65,98 @@ class NestedProgress(object):
         self.term = Terminal() if term is None else term
         self.indent = indent
 
-    def draw(self, obj, flush=True):
-        obj = deepcopy(obj)
+    ##################
+    # Public Methods #
+    ##################
+
+    def draw(self, tree, flush=True):
+        """Draw ``tree`` to the terminal
+
+        :type  tree: dict
+        :param tree: ``tree`` should be a tree representing a hierarchy; each
+            key should be a string describing that hierarchy level and value
+            should also be ``dict`` except for leaves which should be
+            ``BarDescriptors``. See ``BarDescriptor`` for a tree example.
+        :type  flush: bool
+        :param flush: If this is set, output written will be flushed
+        """
+        tree = deepcopy(tree)
         # TODO: Automatically collapse hierarchy so something
         #   will always be displayable (well, unless the top-level)
         #   contains too many to display
-        lines_required = self.lines_required(obj)
+        lines_required = self.lines_required(tree)
         ensure(lines_required <= self.term.height,
                LengthOverflowError,
                "Terminal is not long enough to fit all bars.")
-        self._calculate_values(obj)
-        self._draw(obj)
+        self._calculate_values(tree)
+        self._draw(tree)
         if flush:
             self.term.flush()
 
-    def clear_lines(self, obj):
-        lines_req = self.lines_required(obj)
+    def clear_lines(self, tree):
+        """Clear lines in terminal below current cursor position as required
+
+        This is important to do before drawing to ensure sufficient
+        room at the bottom of your terminal.
+
+        :type  tree: dict
+        :param tree: tree as described in ``BarDescriptor``
+        """
+        lines_req = self.lines_required(tree)
         for i in range(lines_req):
             self.term.stream.write(self.term.move_down)
         for i in range(lines_req):
             self.term.stream.write(self.term.move_up)
 
-    def lines_required(self, obj, count=0):
+    def lines_required(self, tree, count=0):
+        """Calculate number of lines required to draw ``tree``"""
         if all([
-            isinstance(obj, dict),
-            type(obj) != BarDescriptor
+            isinstance(tree, dict),
+            type(tree) != BarDescriptor
         ]):
             return sum(self.lines_required(v, count=count)
-                       for v in obj.values()) + 2
-        elif isinstance(obj, BarDescriptor):
-            if obj.get("kwargs", {}).get("title_pos") in ["left", "right"]:
+                       for v in tree.values()) + 2
+        elif isinstance(tree, BarDescriptor):
+            if tree.get("kwargs", {}).get("title_pos") in ["left", "right"]:
                 return 1
             else:
                 return 2
 
-    def _calculate_values(self, obj):
+    ###################
+    # Private Methods #
+    ###################
+
+    def _calculate_values(self, tree):
+        """Calculate values for drawing bars of non-leafs in ``tree``
+
+        Recurses through ``tree``, replaces ``dict``s with
+            ``(BarDescriptor, dict)`` so ``NestedProgress._draw`` can use
+            the ``BarDescriptor``s to draw the tree
+        """
         if all([
-            isinstance(obj, dict),
-            type(obj) != BarDescriptor
+            isinstance(tree, dict),
+            type(tree) != BarDescriptor
         ]):
-            items = len(obj)
+            items = len(tree)
             value = 0
-            for k in obj:
-                bar_desc = self._calculate_values(obj[k])
+            for k in tree:
+                bar_desc = self._calculate_values(tree[k])
                 val = bar_desc["value"].value
-                obj[k] = (bar_desc, obj[k])
+                tree[k] = (bar_desc, tree[k])
                 value += val
             return BarDescriptor(type=Bar, value=Value(floor(value / items)))
-        elif isinstance(obj, BarDescriptor):
-            return obj
+        elif isinstance(tree, BarDescriptor):
+            return tree
         else:
-            raise TypeError("Unexpected type {}".format(type(obj)))
+            raise TypeError("Unexpected type {}".format(type(tree)))
 
-    def _draw(self, obj, indent=0):
+    def _draw(self, tree, indent=0):
+        """Recurse through ``tree`` and draw all nodes"""
         if all([
-            isinstance(obj, dict),
-            type(obj) != BarDescriptor
+            isinstance(tree, dict),
+            type(tree) != BarDescriptor
         ]):
-            for k, v in sorted(obj.items()):
+            for k, v in sorted(tree.items()):
                 bar_desc, subdict = v[0], v[1]
 
                 args = [self.term] + bar_desc.get("args", [])
