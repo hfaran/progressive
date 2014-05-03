@@ -66,12 +66,13 @@ class TreeProgress(object):
     def __init__(self, term=None, indent=4):
         self.term = Terminal() if term is None else term
         self.indent = indent
+        self._saved = False
 
     ##################
     # Public Methods #
     ##################
 
-    def draw(self, tree, flush=True):
+    def draw(self, tree, save_cursor=True, flush=True):
         """Draw ``tree`` to the terminal
 
         :type  tree: dict
@@ -81,7 +82,14 @@ class TreeProgress(object):
             ``BarDescriptors``. See ``BarDescriptor`` for a tree example.
         :type  flush: bool
         :param flush: If this is set, output written will be flushed
+        :type  save_cursor: bool
+        :param save_cursor: If this is set, cursor location will be saved before
+            drawing; this will OVERWRITE a previous save, so be sure to set
+            this accordingly (to your needs).
         """
+        if save_cursor:
+            self.save()
+
         tree = deepcopy(tree)
         # TODO: Automatically collapse hierarchy so something
         #   will always be displayable (well, unless the top-level)
@@ -94,6 +102,24 @@ class TreeProgress(object):
         self._draw(tree)
         if flush:
             self.term.flush()
+
+    def save(self):
+        """Saves current cursor position, so that it can be restored later"""
+        self.term.stream.write(self.term.save)
+        self._saved = True
+
+    def restore(self):
+        """Restores cursor to the previously saved location
+
+        This is useful after calling TreeProgress.draw(..., save_cursor=True)
+            to restore the cursor to the position it was in before drawing,
+            before drawing again.
+
+        Cursor position will only be restored IF it was previously saved
+            by this TreeProgress instance (and not by any external force)
+        """
+        if self._saved:
+            self.term.stream.write(self.term.restore)
 
     def clear_lines(self, tree):
         """Clear lines in terminal below current cursor position as required

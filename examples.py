@@ -73,13 +73,11 @@ def tree_progress():
     #   is filled out with all the room we need
     n.clear_lines(test_d)
 
-    # Before starting to write, save the cursor position so we can restore
-    #   back to it before writing again
-    t.stream.write(t.save)
     while not are_we_done(test_d):
         sleep(0.1 * random.random())
-
-        t.stream.write(t.restore)
+        # After the cursor position is first saved (in the first draw call)
+        #   this will restore the cursor back to the top so we can draw again
+        n.restore()
         # We use our incr_value method to bump the fake numbers
         incr_value(test_d)
         # Actually draw out the bars
