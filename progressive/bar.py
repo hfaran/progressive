@@ -72,12 +72,12 @@ class Bar(object):
     """
 
     def __init__(
-        self, term, max_value=100, width="25%", title_pos="left",
-        title="Progress", num_rep="fraction", indent=0, filled_color=10,
-        empty_color=240, back_color=None, filled_char=u' ',
-        empty_char=u' ', start_char=u'', end_char=u'', fallback=False,
-        fallback_empty_char=u'◯', fallback_filled_char=u'◉',
-        force_color=None
+            self, term, max_value=100, width="25%", title_pos="left",
+            title="Progress", num_rep="fraction", indent=0, filled_color=10,
+            empty_color=240, back_color=None, filled_char=u' ',
+            empty_char=u' ', start_char=u'', end_char=u'', fallback=False,
+            fallback_empty_char=u'◯', fallback_filled_char=u'◉',
+            force_color=None
     ):
         self._term = term
         self._measure_terminal()
@@ -130,8 +130,8 @@ class Bar(object):
         ensure(self.full_line_width <= self.columns, WidthOverflowError,
                "Attempting to initialize Bar with full_line_width {}; "
                "terminal has width of only {}.".format(
-                    self.full_line_width, self.columns)
-               )
+                   self.full_line_width, self.columns)
+        )
 
     ######################
     # Public Attributes #
@@ -176,7 +176,7 @@ class Bar(object):
             self.max_width,  # Progress bar
             len(self.end_char),
             1,  # Space between end_char and amount_complete_str
-            len(str(self.max_value))*2 + 1  # 100/100
+            len(str(self.max_value)) * 2 + 1  # 100/100
         ])
         return bar_str_len
 

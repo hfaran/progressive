@@ -6,6 +6,7 @@ Usage:
 """
 import random
 from time import sleep
+
 from blessings import Terminal
 
 from progressive.bar import Bar

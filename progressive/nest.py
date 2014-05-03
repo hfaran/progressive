@@ -1,6 +1,7 @@
 from __future__ import division
 
 from copy import deepcopy
+
 from blessings import Terminal
 
 from progressive.bar import Bar
@@ -14,6 +15,7 @@ class Value(object):
     Should be used for ``value`` argument when initializing
         ``BarDescriptor``, e.g., ``BarDescriptor(type=..., value=Value(10))``
     """
+
     def __init__(self, val=0):
         self.value = val
 
