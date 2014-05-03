@@ -1,6 +1,8 @@
 # `progressive`
 
-Progress bars for your terminal, powered by [blessings](https://github.com/erikrose/blessings). Compatible with both Python 2 and 3.
+[![PyPI version](https://badge.fury.io/py/progressive.svg)](http://badge.fury.io/py/progressive)
+
+Colorful progress bars for your terminal, powered by [blessings](https://github.com/erikrose/blessings). Compatible with both Python 2 and 3.
 
 ## Introduction
 

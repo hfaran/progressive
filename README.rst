@@ -5,6 +5,8 @@
 ``progressive``
 ===============
 
+|PyPI version|
+
 Progress bars for your terminal, powered by
 `blessings <https://github.com/erikrose/blessings>`__. Compatible with
 both Python 2 and 3.
@@ -44,5 +46,7 @@ Getting Started
    colors <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`__
    to make full use of ``progressive``.
 
+.. |PyPI version| image:: https://badge.fury.io/py/progressive.svg
+   :target: http://badge.fury.io/py/progressive
 .. |Tree Progress View| image:: https://raw.githubusercontent.com/hfaran/progressive/master/example.gif
    :target: https://github.com/hfaran/progressive
