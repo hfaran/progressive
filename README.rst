@@ -5,4 +5,4 @@
 progressive
 ===========
 
-Nested progress bars with blessings
+Progress bars with blessings

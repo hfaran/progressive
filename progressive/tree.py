@@ -31,7 +31,7 @@ class Value(object):
 class BarDescriptor(dict):
     """Bar descriptor
 
-    To be used in leaf of a tree describing a hierarchy for ``NestedProgress``,
+    To be used in leaf of a tree describing a hierarchy for ``TreeProgress``,
     e.g.,:
 
         tree = {"Job":
@@ -52,8 +52,8 @@ class BarDescriptor(dict):
     """
 
 
-class NestedProgress(object):
-    """Nested progress
+class TreeProgress(object):
+    """Progress display for trees
 
     For drawing a hierarchical progress view from a tree
 
@@ -132,7 +132,7 @@ class NestedProgress(object):
         """Calculate values for drawing bars of non-leafs in ``tree``
 
         Recurses through ``tree``, replaces ``dict``s with
-            ``(BarDescriptor, dict)`` so ``NestedProgress._draw`` can use
+            ``(BarDescriptor, dict)`` so ``TreeProgress._draw`` can use
             the ``BarDescriptor``s to draw the tree
         """
         if all([

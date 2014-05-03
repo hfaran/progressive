@@ -10,45 +10,46 @@ from time import sleep
 from blessings import Terminal
 
 from progressive.bar import Bar
-from progressive.nest import NestedProgress, Value, BarDescriptor
+from progressive.tree import TreeProgress, Value, BarDescriptor
 
 
-def nested_progress():
-    """Example showing nested progress view"""
+def tree_progress():
+    """Example showing tree progress view"""
 
     #############
     # Test data #
     #############
 
     # For this example, we're obviously going to be feeding fictitious data
-    #   to NestedProgress, so here it is
-    vals = [Value(0) for i in range(5)]
+    #   to TreeProgress, so here it is
+    leaf_values = [Value(0) for i in range(5)]
 
     test_d = {
         "Warp Jump": {
             "1) Prepare fuel": {
                 "Load Tanks": {
-                    "Tank 1": BarDescriptor(type=Bar, value=vals[0]),
-                    "Tank 2": BarDescriptor(type=Bar, value=vals[1]),
+                    "Tank 1": BarDescriptor(type=Bar, value=leaf_values[0]),
+                    "Tank 2": BarDescriptor(type=Bar, value=leaf_values[1]),
                 },
-                "Refine tylium ore": BarDescriptor(type=Bar, value=vals[2]),
+                "Refine tylium ore": BarDescriptor(type=Bar,
+                                                   value=leaf_values[2]),
             },
             "2) Calculate jump co-ordinates": {
                 "Resolve common name to co-ordinates": {
                     "Querying resolution from baseship": BarDescriptor(
-                        type=Bar, value=vals[3]
+                        type=Bar, value=leaf_values[3]
                     ),
                 },
             },
             "3) Check FTL drive readiness": BarDescriptor(
-                type=Bar, value=vals[4]
+                type=Bar, value=leaf_values[4]
             )
         }
     }
 
-    # We'll use this function to bump up the numbers
+    # We'll use this function to bump up the leaf values
     def incr_value(obj):
-        for val in vals:
+        for val in leaf_values:
             if val.value == 100:
                 pass
             elif val.value >= 98:
@@ -58,7 +59,7 @@ def nested_progress():
 
     # And this to check if we're to stop drawing
     def are_we_done(obj):
-        return all(val.value == 100 for val in vals)
+        return all(val.value == 100 for val in leaf_values)
 
     ###################
     # The actual code #
@@ -66,8 +67,8 @@ def nested_progress():
 
     # Create blessings.Terminal instance
     t = Terminal()
-    # Initialize a NestedProgress instance
-    n = NestedProgress(term=t)
+    # Initialize a TreeProgress instance
+    n = TreeProgress(term=t)
     # We'll use the clear_lines method to make sure the terminal
     #   is filled out with all the room we need
     n.clear_lines(test_d)
@@ -88,7 +89,7 @@ def nested_progress():
 def two_bar():
     """Two-bar example using just the Bar class
 
-    This example is intended to show usage of the Bar class at the barest
+    This example is intended to show usage of the Bar class at the lowest
     level.
     """
     MAX_VALUE = 100
