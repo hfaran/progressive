@@ -32,7 +32,7 @@ class Value(object):
 class BarDescriptor(dict):
     """Bar descriptor
 
-    To be used in leaf of a tree describing a hierarchy for ``TreeProgress``,
+    To be used in leaf of a tree describing a hierarchy for ``ProgressTree``,
     e.g.,:
 
         tree = {"Job":
@@ -53,7 +53,7 @@ class BarDescriptor(dict):
     """
 
 
-class TreeProgress(Cursor):
+class ProgressTree(Cursor):
     """Progress display for trees
 
     For drawing a hierarchical progress view from a tree
@@ -140,7 +140,7 @@ class TreeProgress(Cursor):
         """Calculate values for drawing bars of non-leafs in ``tree``
 
         Recurses through ``tree``, replaces ``dict``s with
-            ``(BarDescriptor, dict)`` so ``TreeProgress._draw`` can use
+            ``(BarDescriptor, dict)`` so ``ProgressTree._draw`` can use
             the ``BarDescriptor``s to draw the tree
         """
         if all([

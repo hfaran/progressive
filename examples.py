@@ -10,10 +10,10 @@ from time import sleep
 from blessings import Terminal
 
 from progressive.bar import Bar
-from progressive.tree import TreeProgress, Value, BarDescriptor
+from progressive.tree import ProgressTree, Value, BarDescriptor
 
 
-def tree_progress():
+def progress_tree():
     """Example showing tree progress view"""
 
     #############
@@ -21,7 +21,7 @@ def tree_progress():
     #############
 
     # For this example, we're obviously going to be feeding fictitious data
-    #   to TreeProgress, so here it is
+    #   to ProgressTree, so here it is
     leaf_values = [Value(0) for i in range(5)]
 
     test_d = {
@@ -67,8 +67,8 @@ def tree_progress():
 
     # Create blessings.Terminal instance
     t = Terminal()
-    # Initialize a TreeProgress instance
-    n = TreeProgress(term=t)
+    # Initialize a ProgressTree instance
+    n = ProgressTree(term=t)
     # We'll use the clear_lines method to make sure the terminal
     #   is filled out with all the room we need
     n.clear_lines(test_d)
