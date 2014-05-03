@@ -15,10 +15,8 @@ Introduction
 ``progressive`` lets you view progress of complex workflows as well as
 simple ones:
 
-.. figure:: example.gif
-   :alt: Image
+|Tree Progress View|
 
-   Image
 Installation
 ------------
 
@@ -45,3 +43,6 @@ Getting Started
    without colors, `but you really should upgrade your terminal to 256
    colors <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`__
    to make full use of ``progressive``.
+
+.. |Tree Progress View| image:: https://raw.githubusercontent.com/hfaran/progressive/master/example.gif
+   :target: https://github.com/hfaran/progressive

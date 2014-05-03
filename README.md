@@ -6,7 +6,7 @@ Progress bars for your terminal, powered by [blessings](https://github.com/erikr
 
 `progressive` lets you view progress of complex workflows as well as simple ones:
 
-![Image](example.gif)
+[![Tree Progress View](https://raw.githubusercontent.com/hfaran/progressive/master/example.gif)](https://github.com/hfaran/progressive)
 
 
 ## Installation
