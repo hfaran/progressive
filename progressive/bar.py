@@ -21,7 +21,7 @@ class Bar(Cursor):
         `this <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`_ for Ubuntu
         installation as an example.
 
-    :type  term: blessings.Terminal()
+    :type  term: blessings.Terminal|NoneType
     :param term: blessings.Terminal instance for the terminal of display
     :type  max_value: int
     :param max_value: The capacity of the bar, i.e., ``value/max_value``
@@ -73,7 +73,7 @@ class Bar(Cursor):
     """
 
     def __init__(
-            self, term, max_value=100, width="25%", title_pos="left",
+            self, term=None, max_value=100, width="25%", title_pos="left",
             title="Progress", num_rep="fraction", indent=0, filled_color=10,
             empty_color=240, back_color=None, filled_char=u' ',
             empty_char=u' ', start_char=u'', end_char=u'', fallback=False,
@@ -107,7 +107,7 @@ class Bar(Cursor):
             supports_colors = force_color
         else:
             supports_colors = self._supports_colors(
-                term=term,
+                term=self.term,
                 raise_err=not fallback,
                 colors=(filled_color, empty_color)
             )
@@ -115,12 +115,12 @@ class Bar(Cursor):
             self._filled_char = filled_char
             self._empty_char = empty_char
             self._filled = self._get_format_callable(
-                term=term,
+                term=self.term,
                 color=filled_color,
                 back_color=back_color
             )
             self._empty = self._get_format_callable(
-                term=term,
+                term=self.term,
                 color=empty_color,
                 back_color=back_color
             )
@@ -132,8 +132,8 @@ class Bar(Cursor):
         ensure(self.full_line_width <= self.columns, WidthOverflowError,
                "Attempting to initialize Bar with full_line_width {}; "
                "terminal has width of only {}.".format(
-                   self.full_line_width, self.columns)
-        )
+                   self.full_line_width,
+                   self.columns))
 
     ######################
     # Public Attributes #
@@ -337,11 +337,13 @@ class Bar(Cursor):
     # Public Methods #
     ##################
 
-    def draw(self, value):
+    def draw(self, value, newline=True, flush=True):
         """Draw the progress bar
 
         :type  value: int
         :param value: Progress value relative to ``self.max_value``
+        :type  newline: bool
+        :param newline: If this is set, a newline will be written after drawing
         """
         # This is essentially winch-handling without having
         #   to do winch-handling; cleanly redrawing on winch is difficult
@@ -398,3 +400,9 @@ class Bar(Cursor):
                 self.title,
             )
             self._write(title_str, ignore_overflow=True)
+
+        # Newline to wrap up
+        if newline:
+            self.newline()
+        if flush:
+            self.flush()

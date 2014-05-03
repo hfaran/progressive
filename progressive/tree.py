@@ -2,8 +2,6 @@ from __future__ import division
 
 from copy import deepcopy
 
-from blessings import Terminal
-
 from progressive.bar import Bar
 from progressive.cursor import Cursor
 from progressive.util import floor, ensure
@@ -103,7 +101,7 @@ class ProgressTree(Cursor):
         if flush:
             self.term.flush()
 
-    def clear_lines(self, tree):
+    def make_room(self, tree):
         """Clear lines in terminal below current cursor position as required
 
         This is important to do before drawing to ensure sufficient
@@ -113,10 +111,7 @@ class ProgressTree(Cursor):
         :param tree: tree as described in ``BarDescriptor``
         """
         lines_req = self.lines_required(tree)
-        for i in range(lines_req):
-            self.term.stream.write(self.term.move_down)
-        for i in range(lines_req):
-            self.term.stream.write(self.term.move_up)
+        self.clear_lines(lines_req)
 
     def lines_required(self, tree, count=0):
         """Calculate number of lines required to draw ``tree``"""
@@ -174,8 +169,6 @@ class ProgressTree(Cursor):
                 kwargs.update(bar_desc.get("kwargs", {}))
 
                 b = Bar(*args, **kwargs)
-                b.draw(bar_desc["value"].value)
-                self.term.stream.write(self.term.move_down)
-                self.term.stream.write(self.term.clear_bol)
+                b.draw(value=bar_desc["value"].value, flush=False)
 
                 self._draw(subdict, indent=indent + self.indent)
