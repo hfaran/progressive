@@ -27,4 +27,5 @@ python setup.py install
 
 ## Getting Started
 
-Documentation is coming soon, but in the meantime check out the [examples](https://github.com/hfaran/progressive/blob/master/examples.py).
+* Documentation is coming soon, but in the meantime check out the [examples](https://github.com/hfaran/progressive/blob/master/examples.py).
+* `progressive` supports graceful fallback modes for terminals without colors, [but you really should upgrade your terminal to 256 colors](http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/) to make full use of `progressive`.
