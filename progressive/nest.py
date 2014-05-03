@@ -10,8 +10,16 @@ from progressive.exceptions import LengthOverflowError
 
 class Value(object):
 
-    def __init__(self, value):
-        self.value = value
+    def __init__(self, val=0):
+        self.value = val
+
+    @property
+    def value(self):
+        return self._value
+
+    @value.setter
+    def value(self, val):
+        self._value = floor(val)
 
 
 class BarDescriptor(dict):
