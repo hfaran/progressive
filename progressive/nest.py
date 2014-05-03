@@ -9,7 +9,11 @@ from progressive.exceptions import LengthOverflowError
 
 
 class Value(object):
+    """Container class for use with ``BarDescriptor``
 
+    Should be used for ``value`` argument when initializing
+        ``BarDescriptor``, e.g., ``BarDescriptor(type=..., value=Value(10))``
+    """
     def __init__(self, val=0):
         self.value = val
 
@@ -23,11 +27,35 @@ class Value(object):
 
 
 class BarDescriptor(dict):
-    """Bar descriptor"""
+    """Bar descriptor
+
+    To be used in leaf of a tree describing a hierarchy for ``NestedProgress``,
+    e.g.,:
+
+        tree = {"Job": {"Task1": BarDescriptor(...)}, {"Task2":
+        BarDescriptor(...)}}
+
+    :type  type: Bar|subclass of Bar
+    :param type: The type of Bar to use to display that leaf
+    :type  value: Value
+    :param value: Amount to fill the progress bar vs. its max value
+    :type  args: list
+    :param args: A list of args to instantiate ``type`` with
+    :type  kwargs: dict
+    :param kwargs: A dict of kwargs to instantiate ``type`` with
+    """
 
 
 class NestedProgress(object):
-    """Nested progress"""
+    """Nested progress
+
+    For drawing a hierarchical progress view from a tree
+
+    :type  term: NoneType|blessings.Terminal
+    :param term: Terminal instance; if not given, will be created by the class
+    :type  indent: int
+    :param indent: The amount of indentation between each level in hierarchy
+    """
 
     def __init__(self, term=None, indent=4):
         self.term = Terminal() if term is None else term
