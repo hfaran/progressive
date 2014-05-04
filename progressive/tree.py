@@ -100,7 +100,8 @@ class ProgressTree(object):
         lines_required = self.lines_required(tree)
         ensure(lines_required <= self.cursor.term.height,
                LengthOverflowError,
-               "Terminal is not long enough to fit all bars.")
+               "Terminal is not long ({} rows) enough to fit all bars "
+               "({} rows).".format(self.cursor.term.height, lines_required))
         bar_desc = BarDescriptor(type=Bar) if not bar_desc else bar_desc
         self._calculate_values(tree, bar_desc)
         self._draw(tree)
