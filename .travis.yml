@@ -9,3 +9,5 @@ install:
     - "pip install nose-cov"
 script:
     - nosetests --with-cov --cov-report term-missing --cov progressive tests/
+after_success:
+    coveralls --verbose
