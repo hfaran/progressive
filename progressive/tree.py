@@ -4,7 +4,7 @@ from copy import deepcopy
 
 from progressive.bar import Bar
 from progressive.cursor import Cursor
-from progressive.util import floor, ensure
+from progressive.util import floor, ensure, merge_dicts
 from progressive.exceptions import LengthOverflowError
 
 
@@ -70,7 +70,7 @@ class ProgressTree(Cursor):
     # Public Methods #
     ##################
 
-    def draw(self, tree, save_cursor=True, flush=True):
+    def draw(self, tree, bar_desc=None, save_cursor=True, flush=True):
         """Draw ``tree`` to the terminal
 
         :type  tree: dict
@@ -78,6 +78,11 @@ class ProgressTree(Cursor):
             key should be a string describing that hierarchy level and value
             should also be ``dict`` except for leaves which should be
             ``BarDescriptors``. See ``BarDescriptor`` for a tree example.
+        :type  bar_desc: BarDescriptor|NoneType
+        :param bar_desc: For describing non-leaf bars in that will be
+            drawn from ``tree``; certain attributes such as ``value``
+            and ``kwargs["max_value"]`` will of course be overridden
+            if provided.
         :type  flush: bool
         :param flush: If this is set, output written will be flushed
         :type  save_cursor: bool
@@ -96,7 +101,8 @@ class ProgressTree(Cursor):
         ensure(lines_required <= self.term.height,
                LengthOverflowError,
                "Terminal is not long enough to fit all bars.")
-        self._calculate_values(tree)
+        bar_desc = BarDescriptor(type=Bar) if not bar_desc else bar_desc
+        self._calculate_values(tree, bar_desc)
         self._draw(tree)
         if flush:
             self.term.flush()
@@ -131,7 +137,7 @@ class ProgressTree(Cursor):
     # Private Methods #
     ###################
 
-    def _calculate_values(self, tree):
+    def _calculate_values(self, tree, bar_d):
         """Calculate values for drawing bars of non-leafs in ``tree``
 
         Recurses through ``tree``, replaces ``dict``s with
@@ -142,15 +148,28 @@ class ProgressTree(Cursor):
             isinstance(tree, dict),
             type(tree) != BarDescriptor
         ]):
+            # Calculate value and max_value
             max_val = 0
             value = 0
             for k in tree:
-                bar_desc = self._calculate_values(tree[k])
+                # Get descriptor by recursing
+                bar_desc = self._calculate_values(tree[k], bar_d)
+                # Reassign to tuple of (new descriptor, tree below)
                 tree[k] = (bar_desc, tree[k])
                 value += bar_desc["value"].value
                 max_val += bar_desc.get("kwargs", {}).get("max_value", 100)
-            return BarDescriptor(type=Bar, value=Value(floor(value)),
-                                 kwargs=dict(max_value=max_val))
+            # Merge in values from ``bar_d`` before returning descriptor
+            kwargs = merge_dicts(
+                bar_d.get("kwargs", {}),
+                dict(max_value=max_val),
+                deepcopy=True
+            )
+            ret_d = merge_dicts(
+                bar_d,
+                dict(value=Value(floor(value)), kwargs=kwargs),
+                deepcopy=True
+            )
+            return BarDescriptor(ret_d)
         elif isinstance(tree, BarDescriptor):
             return tree
         else:

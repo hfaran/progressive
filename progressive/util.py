@@ -1,4 +1,6 @@
 import math
+import copy
+from itertools import chain
 
 
 def floor(x):
@@ -27,3 +29,16 @@ def u(s):
     :returns: Equivalent of unicode(s) (at least I hope so)
     """
     return u'{}'.format(s)
+
+
+def merge_dicts(*dicts, deepcopy=False):
+    """Merges dicts
+
+    In case of key conflicts, the value kept will be from the latter
+    dictionary in the list of dictionaries
+
+    :param deepcopy: deepcopy items within dicts
+    """
+    assert all(isinstance(d, dict) for d in dicts)
+    return dict(chain(*[copy.deepcopy(d).items() if deepcopy else d.items()
+                        for d in dicts]))

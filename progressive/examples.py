@@ -84,7 +84,7 @@ def tree():
         # We use our incr_value method to bump the fake numbers
         incr_value(test_d)
         # Actually draw out the bars
-        n.draw(test_d)
+        n.draw(test_d, BarDescriptor(bd_defaults))
 
 
 def simple():
