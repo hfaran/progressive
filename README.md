@@ -1,5 +1,6 @@
 # `progressive`
 
+[![Build Status](https://travis-ci.org/hfaran/progressive.svg)](https://travis-ci.org/hfaran/progressive)
 [![PyPI version](https://badge.fury.io/py/progressive.svg)](http://badge.fury.io/py/progressive)
 [![Stories in Ready](https://badge.waffle.io/hfaran/progressive.png?label=Ready)](http://waffle.io/hfaran/progressive)
 

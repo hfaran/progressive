@@ -5,7 +5,7 @@
 ``progressive``
 ===============
 
-|PyPI version| |Stories in Ready|
+|Build Status| |PyPI version| |Stories in Ready|
 
 Colorful progress bars and trees for your terminal, powered by
 `blessings <https://github.com/erikrose/blessings>`__. Compatible with
@@ -46,6 +46,8 @@ Getting Started
    colors <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`__
    to make full use of ``progressive``.
 
+.. |Build Status| image:: https://travis-ci.org/hfaran/progressive.svg
+   :target: https://travis-ci.org/hfaran/progressive
 .. |PyPI version| image:: https://badge.fury.io/py/progressive.svg
    :target: http://badge.fury.io/py/progressive
 .. |Stories in Ready| image:: https://badge.waffle.io/hfaran/progressive.png?label=Ready
