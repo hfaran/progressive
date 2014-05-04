@@ -51,7 +51,7 @@ class BarDescriptor(dict):
     """
 
 
-class ProgressTree(Cursor):
+class ProgressTree(object):
     """Progress display for trees
 
     For drawing a hierarchical progress view from a tree
@@ -63,7 +63,7 @@ class ProgressTree(Cursor):
     """
 
     def __init__(self, term=None, indent=4):
-        Cursor.__init__(self, term)
+        self.cursor = Cursor(term)
         self.indent = indent
 
     ##################
@@ -91,21 +91,21 @@ class ProgressTree(Cursor):
             this accordingly (to your needs).
         """
         if save_cursor:
-            self.save()
+            self.cursor.save()
 
         tree = deepcopy(tree)
         # TODO: Automatically collapse hierarchy so something
         #   will always be displayable (well, unless the top-level)
         #   contains too many to display
         lines_required = self.lines_required(tree)
-        ensure(lines_required <= self.term.height,
+        ensure(lines_required <= self.cursor.term.height,
                LengthOverflowError,
                "Terminal is not long enough to fit all bars.")
         bar_desc = BarDescriptor(type=Bar) if not bar_desc else bar_desc
         self._calculate_values(tree, bar_desc)
         self._draw(tree)
         if flush:
-            self.term.flush()
+            self.cursor.flush()
 
     def make_room(self, tree):
         """Clear lines in terminal below current cursor position as required
@@ -117,7 +117,7 @@ class ProgressTree(Cursor):
         :param tree: tree as described in ``BarDescriptor``
         """
         lines_req = self.lines_required(tree)
-        self.clear_lines(lines_req)
+        self.cursor.clear_lines(lines_req)
 
     def lines_required(self, tree, count=0):
         """Calculate number of lines required to draw ``tree``"""
@@ -184,7 +184,7 @@ class ProgressTree(Cursor):
             for k, v in sorted(tree.items()):
                 bar_desc, subdict = v[0], v[1]
 
-                args = [self.term] + bar_desc.get("args", [])
+                args = [self.cursor.term] + bar_desc.get("args", [])
                 kwargs = dict(title_pos="above", indent=indent, title=k)
                 kwargs.update(bar_desc.get("kwargs", {}))
 

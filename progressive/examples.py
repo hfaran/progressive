@@ -80,7 +80,7 @@ def tree():
         sleep(0.2 * random.random())
         # After the cursor position is first saved (in the first draw call)
         #   this will restore the cursor back to the top so we can draw again
-        n.restore()
+        n.cursor.restore()
         # We use our incr_value method to bump the fake numbers
         incr_value(test_d)
         # Actually draw out the bars
@@ -98,14 +98,14 @@ def simple():
     # Create our test progress bar
     bar = Bar(max_value=MAX_VALUE, fallback=True)
 
-    bar.clear_lines(2)
+    bar.cursor.clear_lines(2)
      # Before beginning to draw our bars, we save the position
     #   of our cursor so we can restore back to this position before writing
     #   the next time.
-    bar.save()
+    bar.cursor.save()
     for i in range(MAX_VALUE + 1):
         sleep(0.1 * random.random())
         # We restore the cursor to saved position before writing
-        bar.restore()
+        bar.cursor.restore()
         # Now we draw the bar
         bar.draw(value=i)

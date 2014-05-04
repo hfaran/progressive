@@ -8,7 +8,7 @@ from progressive.util import floor, ensure, u
 from progressive.exceptions import ColorUnsupportedError, WidthOverflowError
 
 
-class Bar(Cursor):
+class Bar(object):
     """Progress Bar with blessings
 
     Several parts of this class are thanks to Erik Rose's implementation
@@ -80,7 +80,8 @@ class Bar(Cursor):
             fallback_empty_char=u'◯', fallback_filled_char=u'◉',
             force_color=None
     ):
-        Cursor.__init__(self, term)
+        self.cursor = Cursor(term)
+        self.term = self.cursor.term
 
         self._measure_terminal()
 
@@ -403,6 +404,6 @@ class Bar(Cursor):
 
         # Newline to wrap up
         if newline:
-            self.newline()
+            self.cursor.newline()
         if flush:
-            self.flush()
+            self.cursor.flush()
