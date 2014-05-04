@@ -1,5 +1,4 @@
 include requirements.txt
 include README.rst
 include example.gif
-include examples.py
 include LICENSE
