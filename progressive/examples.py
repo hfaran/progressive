@@ -2,7 +2,7 @@
 """Examples
 
 Usage:
-`python -c "from examples import *; tree()"` as an example
+`python -c "from progressive.examples import *; tree()"` as an example
 """
 import random
 from time import sleep
@@ -23,14 +23,14 @@ def tree():
     # For this example, we're obviously going to be feeding fictitious data
     #   to ProgressTree, so here it is
     leaf_values = [Value(0) for i in range(6)]
-    bd_defaults = dict(type=Bar)
+    bd_defaults = dict(type=Bar, kwargs=dict(max_value=10))
 
     test_d = {
         "Warp Jump": {
             "1) Prepare fuel": {
                 "Load Tanks": {
-                    "Tank 1": BarDescriptor(value=leaf_values[0]),
-                    "Tank 2": BarDescriptor(value=leaf_values[1]),
+                    "Tank 1": BarDescriptor(value=leaf_values[0], **bd_defaults),
+                    "Tank 2": BarDescriptor(value=leaf_values[1], **bd_defaults),
                 },
                 "Refine tylium ore": BarDescriptor(
                     value=leaf_values[2], **bd_defaults
@@ -56,16 +56,15 @@ def tree():
     # We'll use this function to bump up the leaf values
     def incr_value(obj):
         for val in leaf_values:
-            if val.value == 100:
+            if val.value == 10:
                 pass
-            elif val.value >= 98:
-                val.value = 100
             else:
-                val.value += random.choice(range(3))
+                val.value += 1
+                break
 
     # And this to check if we're to stop drawing
     def are_we_done(obj):
-        return all(val.value == 100 for val in leaf_values)
+        return all(val.value == 10 for val in leaf_values)
 
     ###################
     # The actual code #
@@ -80,7 +79,7 @@ def tree():
     n.make_room(test_d)
 
     while not are_we_done(test_d):
-        sleep(0.1 * random.random())
+        sleep(0.2 * random.random())
         # After the cursor position is first saved (in the first draw call)
         #   this will restore the cursor back to the top so we can draw again
         n.restore()
