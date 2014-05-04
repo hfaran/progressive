@@ -7,7 +7,7 @@
 
 |PyPI version|
 
-Colorful progress bars for your terminal, powered by
+Colorful progress bars and trees for your terminal, powered by
 `blessings <https://github.com/erikrose/blessings>`__. Compatible with
 both Python 2 and 3.
 
