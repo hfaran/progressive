@@ -3,6 +3,9 @@ python:
     - "2.7"
     - "3.3"
     - "3.4"
+before_install:
+    - sudo apt-get install ncurses-term
+    - TERM=xterm-256color
 install:
     - "pip install -r requirements.txt --use-mirrors"
     - "pip install nose"
