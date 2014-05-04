@@ -31,14 +31,15 @@ def u(s):
     return u'{}'.format(s)
 
 
-def merge_dicts(*dicts, deepcopy=False):
+def merge_dicts(dicts, deepcopy=False):
     """Merges dicts
 
     In case of key conflicts, the value kept will be from the latter
     dictionary in the list of dictionaries
 
+    :param dicts: [dict, ...]
     :param deepcopy: deepcopy items within dicts
     """
-    assert all(isinstance(d, dict) for d in dicts)
+    assert isinstance(dicts, list) and all(isinstance(d, dict) for d in dicts)
     return dict(chain(*[copy.deepcopy(d).items() if deepcopy else d.items()
                         for d in dicts]))

@@ -160,13 +160,13 @@ class ProgressTree(object):
                 max_val += bar_desc.get("kwargs", {}).get("max_value", 100)
             # Merge in values from ``bar_d`` before returning descriptor
             kwargs = merge_dicts(
-                bar_d.get("kwargs", {}),
-                dict(max_value=max_val),
+                [bar_d.get("kwargs", {}),
+                 dict(max_value=max_val)],
                 deepcopy=True
             )
             ret_d = merge_dicts(
-                bar_d,
-                dict(value=Value(floor(value)), kwargs=kwargs),
+                [bar_d,
+                 dict(value=Value(floor(value)), kwargs=kwargs)],
                 deepcopy=True
             )
             return BarDescriptor(ret_d)
