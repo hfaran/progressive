@@ -2,7 +2,7 @@
 """Examples
 
 Usage:
-`python -c "from examples import *; simple()"` as an example
+`python -c "from examples import *; tree()"` as an example
 """
 import random
 from time import sleep
@@ -13,7 +13,7 @@ from progressive.bar import Bar
 from progressive.tree import ProgressTree, Value, BarDescriptor
 
 
-def progress_tree():
+def tree():
     """Example showing tree progress view"""
 
     #############
@@ -22,28 +22,34 @@ def progress_tree():
 
     # For this example, we're obviously going to be feeding fictitious data
     #   to ProgressTree, so here it is
-    leaf_values = [Value(0) for i in range(5)]
+    leaf_values = [Value(0) for i in range(6)]
+    bd_defaults = dict(type=Bar)
 
     test_d = {
         "Warp Jump": {
             "1) Prepare fuel": {
                 "Load Tanks": {
-                    "Tank 1": BarDescriptor(type=Bar, value=leaf_values[0]),
-                    "Tank 2": BarDescriptor(type=Bar, value=leaf_values[1]),
+                    "Tank 1": BarDescriptor(value=leaf_values[0]),
+                    "Tank 2": BarDescriptor(value=leaf_values[1]),
                 },
-                "Refine tylium ore": BarDescriptor(type=Bar,
-                                                   value=leaf_values[2]),
+                "Refine tylium ore": BarDescriptor(
+                    value=leaf_values[2], **bd_defaults
+                ),
             },
             "2) Calculate jump co-ordinates": {
                 "Resolve common name to co-ordinates": {
                     "Querying resolution from baseship": BarDescriptor(
-                        type=Bar, value=leaf_values[3]
+                        value=leaf_values[3], **bd_defaults
                     ),
                 },
             },
-            "3) Check FTL drive readiness": BarDescriptor(
-                type=Bar, value=leaf_values[4]
-            )
+            "3) Perform jump": {
+                "Check FTL drive readiness": BarDescriptor(
+                    value=leaf_values[4], **bd_defaults
+                ),
+                "Juuuuuump!": BarDescriptor(value=leaf_values[5],
+                                            **bd_defaults)
+            }
         }
     }
 
