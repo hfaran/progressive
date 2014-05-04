@@ -5,7 +5,7 @@
 ``progressive``
 ===============
 
-|Build Status| |PyPI version| |Stories in Ready|
+|Build Status| |Coverage Status| |PyPI version| |Stories in Ready|
 
 Colorful progress bars and trees for your terminal, powered by
 `blessings <https://github.com/erikrose/blessings>`__. Compatible with
@@ -48,6 +48,8 @@ Getting Started
 
 .. |Build Status| image:: https://travis-ci.org/hfaran/progressive.svg
    :target: https://travis-ci.org/hfaran/progressive
+.. |Coverage Status| image:: https://coveralls.io/repos/hfaran/progressive/badge.png
+   :target: https://coveralls.io/r/hfaran/progressive
 .. |PyPI version| image:: https://badge.fury.io/py/progressive.svg
    :target: http://badge.fury.io/py/progressive
 .. |Stories in Ready| image:: https://badge.waffle.io/hfaran/progressive.png?label=Ready
