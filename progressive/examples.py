@@ -56,9 +56,7 @@ def tree():
     # We'll use this function to bump up the leaf values
     def incr_value(obj):
         for val in leaf_values:
-            if val.value == 10:
-                pass
-            else:
+            if val.value < 10:
                 val.value += 1
                 break
 

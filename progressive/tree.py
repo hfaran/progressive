@@ -142,14 +142,15 @@ class ProgressTree(Cursor):
             isinstance(tree, dict),
             type(tree) != BarDescriptor
         ]):
-            items = len(tree)
+            max_val = 0
             value = 0
             for k in tree:
                 bar_desc = self._calculate_values(tree[k])
-                val = bar_desc["value"].value
                 tree[k] = (bar_desc, tree[k])
-                value += val
-            return BarDescriptor(type=Bar, value=Value(floor(value / items)))
+                value += bar_desc["value"].value
+                max_val += bar_desc.get("kwargs", {}).get("max_value", 100)
+            return BarDescriptor(type=Bar, value=Value(floor(value)),
+                                 kwargs=dict(max_value=max_val))
         elif isinstance(tree, BarDescriptor):
             return tree
         else:
