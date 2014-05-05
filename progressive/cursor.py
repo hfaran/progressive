@@ -1,3 +1,5 @@
+import os
+
 from blessings import Terminal
 
 
@@ -10,11 +12,22 @@ class Cursor(object):
 
     def __init__(self, term=None):
         self.term = Terminal() if term is None else term
+        self._stream = self.term.stream
         self._saved = False
+
+    def write(self, s):
+        """Writes ``s`` to the terminal output stream
+
+        Writes can be disabled by setting the environment variable
+            `PROGRESSIVE_NOWRITE` to `'True'`
+        """
+        should_write_s = os.getenv('PROGRESSIVE_NOWRITE') != "True"
+        if should_write_s:
+            self._stream.write(s)
 
     def save(self):
         """Saves current cursor position, so that it can be restored later"""
-        self.term.stream.write(self.term.save)
+        self.write(self.term.save)
         self._saved = True
 
     def restore(self):
@@ -24,19 +37,19 @@ class Cursor(object):
             by this instance (and not by any external force)
         """
         if self._saved:
-            self.term.stream.write(self.term.restore)
+            self.write(self.term.restore)
 
     def flush(self):
         """Flush buffer of terminal output stream"""
-        self.term.stream.flush()
+        self._stream.flush()
 
     def newline(self):
         """Effects a newline by moving the cursor down and clearing"""
-        self.term.stream.write(self.term.move_down)
-        self.term.stream.write(self.term.clear_bol)
+        self.write(self.term.move_down)
+        self.write(self.term.clear_bol)
 
     def clear_lines(self, num_lines=0):
         for i in range(num_lines):
-            self.term.stream.write(self.term.move_down)
+            self.write(self.term.move_down)
         for i in range(num_lines):
-            self.term.stream.write(self.term.move_up)
+            self.write(self.term.move_up)
