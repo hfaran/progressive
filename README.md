@@ -1,3 +1,5 @@
+**Alpha Warning! Until `1.0.0`, `progressive` will likely be going under some kind of radical API revision every minor release; just a forewarning.**
+
 # `progressive`
 
 [![Build Status](https://travis-ci.org/hfaran/progressive.svg?branch=master)](https://travis-ci.org/hfaran/progressive?branch=master)
