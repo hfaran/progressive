@@ -1,7 +1,7 @@
-from abc import abstractproperty
+from abc import abstractproperty, ABCMeta
 
 
-class Block(object):
+class Block(metaclass=ABCMeta):
     """Building block for a progress view"""
 
     @abstractproperty
