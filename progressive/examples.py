@@ -7,8 +7,6 @@ Usage:
 import random
 from time import sleep
 
-from blessings import Terminal
-
 from progressive.bar import Bar
 from progressive.tree import ProgressTree, Value, BarDescriptor
 
@@ -92,10 +90,8 @@ def tree():
     # The actual code #
     ###################
 
-    # Create blessings.Terminal instance
-    t = Terminal()
     # Initialize a ProgressTree instance
-    n = ProgressTree(term=t)
+    n = ProgressTree()
     # We'll use the make_room method to make sure the terminal
     #   is filled out with all the room we need
     n.make_room(test_d)
