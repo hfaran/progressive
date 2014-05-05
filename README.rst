@@ -46,10 +46,10 @@ Getting Started
    colors <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`__
    to make full use of ``progressive``.
 
-.. |Build Status| image:: https://travis-ci.org/hfaran/progressive.svg
-   :target: https://travis-ci.org/hfaran/progressive
-.. |Coverage Status| image:: https://coveralls.io/repos/hfaran/progressive/badge.png
-   :target: https://coveralls.io/r/hfaran/progressive
+.. |Build Status| image:: https://travis-ci.org/hfaran/progressive.svg?branch=master
+   :target: https://travis-ci.org/hfaran/progressive?branch=master
+.. |Coverage Status| image:: https://coveralls.io/repos/hfaran/progressive/badge.png?branch=master
+   :target: https://coveralls.io/r/hfaran/progressive?branch=master
 .. |PyPI version| image:: https://badge.fury.io/py/progressive.svg
    :target: http://badge.fury.io/py/progressive
 .. |Stories in Ready| image:: https://badge.waffle.io/hfaran/progressive.png?label=Ready

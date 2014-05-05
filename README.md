@@ -1,7 +1,7 @@
 # `progressive`
 
-[![Build Status](https://travis-ci.org/hfaran/progressive.svg)](https://travis-ci.org/hfaran/progressive)
-[![Coverage Status](https://coveralls.io/repos/hfaran/progressive/badge.png)](https://coveralls.io/r/hfaran/progressive)
+[![Build Status](https://travis-ci.org/hfaran/progressive.svg?branch=master)](https://travis-ci.org/hfaran/progressive?branch=master)
+[![Coverage Status](https://coveralls.io/repos/hfaran/progressive/badge.png?branch=master)](https://coveralls.io/r/hfaran/progressive?branch=master)
 [![PyPI version](https://badge.fury.io/py/progressive.svg)](http://badge.fury.io/py/progressive)
 [![Stories in Ready](https://badge.waffle.io/hfaran/progressive.png?label=Ready)](http://waffle.io/hfaran/progressive)
 
