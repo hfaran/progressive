@@ -1,4 +1,4 @@
-from progressive.block import Block
+from progressive.blocks.block import Block
 
 
 class Indent(Block):
