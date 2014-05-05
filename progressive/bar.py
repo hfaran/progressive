@@ -319,8 +319,6 @@ class Bar(object):
         :param err_msg: The error message given to WidthOverflowError
             if it is triggered
         """
-        stream = self.term.stream
-
         if not ignore_overflow:
             s_length = len(s) if s_length is None else s_length
             if err_msg is None:
@@ -330,9 +328,9 @@ class Bar(object):
                         self.columns, repr(s), s_length)
                 )
             ensure(s_length <= self.columns, WidthOverflowError, err_msg)
-        stream.write(s)
+        self.cursor.write(s)
         if flush:
-            stream.flush()
+            self.cursor.flush()
 
     ##################
     # Public Methods #
