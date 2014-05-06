@@ -74,8 +74,8 @@ class Bar(object):
 
     def __init__(
             self, term=None, max_value=100, width="25%", title_pos="left",
-            title="Progress", num_rep="fraction", indent=0, filled_color=10,
-            empty_color=240, back_color=None, filled_char=u' ',
+            title="Progress", num_rep="fraction", indent=0, filled_color=2,
+            empty_color=7, back_color=None, filled_char=u' ',
             empty_char=u' ', start_char=u'', end_char=u'', fallback=True,
             fallback_empty_char=u'◯', fallback_filled_char=u'◉',
             force_color=None
