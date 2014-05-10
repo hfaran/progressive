@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 class ProgressiveException(Exception):
     """Base class for exceptions raised by ``progressive``"""
 

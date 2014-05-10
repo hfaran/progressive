@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from progressive.blocks.block import Block
 from progressive.util import u
 
