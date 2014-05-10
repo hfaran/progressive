@@ -1,4 +1,5 @@
 from progressive.blocks.block import Block
+from progressive.util import u
 
 
 class Indent(Block):
@@ -11,7 +12,7 @@ class Indent(Block):
     """
     def __init__(self, length=4, character=u" "):
         self._length = length
-        self._repr = character*length
+        self._repr = u(character*length)
 
     @property
     def repr(self):
