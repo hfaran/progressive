@@ -8,10 +8,9 @@ class Block(metaclass=ABCMeta):
 
     @abstractproperty
     def repr(self):
-        """Returns a unicode string representing the block or a list of
-        unicode strings with separation of each representing a newline.
+        """Returns a unicode string representing the block
 
-        :rtype: list|unicode|str
+        :rtype: unicode|str
         """
         raise NotImplementedError
 
@@ -20,12 +19,9 @@ class Block(metaclass=ABCMeta):
         """A more accurate ``len(self.repr)`` if ``self.repr``
         has custom formatting for which ``len`` gives incorrect output.
 
-        If self.repr has no newlines, should return an ``int``, otherwise,
-        a list of ints, each of the length of each line separated by newlines.
-        This will let us know of how many lines to allocate using
-        ``clear_lines`` and if the terminal is wide enough for displaying
-        everything in the classes that are composed of ``Block``s.
-
         :rtype: list|int
         """
         raise NotImplementedError
+
+    def __repr__(self):
+        return "{}({})".format(self.__class__.__name__, self.repr)
