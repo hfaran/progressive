@@ -3,8 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
-from progressive.cursor import Cursor
-from progressive.util import floor, ensure, u
+from progressive.util import floor, ensure, u, check_color_support
 from progressive.exceptions import ColorUnsupportedError, WidthOverflowError
 from progressive.blocks.indent import Indent
 from progressive.blocks.bar import BaseBar
@@ -13,20 +12,9 @@ from progressive.blocks.percentage import Fraction, Percentage
 
 
 class Bar(object):
-    """Progress Bar with blessings
+    """Basic progress bar
 
-    Several parts of this class are thanks to Erik Rose's implementation
-    of ``ProgressBar`` in ``nose-progressive``, licensed under
-    The MIT License.
-    `MIT <http://opensource.org/licenses/MIT>`_
-    `nose-progressive/noseprogressive/bar.py <https://github.com/erikrose/nose-progressive/blob/master/noseprogressive/bar.py>`_
-
-    Terminal with 256 colors is recommended. See
-        `this <http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/>`_ for Ubuntu
-        installation as an example.
-
-    :type  term: blessings.Terminal|NoneType
-    :param term: blessings.Terminal instance for the terminal of display
+    :type  cursor: progressive.cursor.Cursor
     :type  max_value: int
     :param max_value: The capacity of the bar, i.e., ``value/max_value``
     :type  width: str
@@ -77,63 +65,61 @@ class Bar(object):
     """
 
     def __init__(
-            self, term=None, max_value=100, width="25%", title_pos="left",
+            self, cursor, max_value=100, width="25%", title_pos="left",
             title="Progress", num_rep="fraction", indent=0,
             filled_color="green", empty_color="white", back_color=None,
             filled_char=u' ', empty_char=u' ', start_char=u'',
             end_char=u'', fallback=True, fallback_empty_char=u'◯',
             fallback_filled_char=u'◉', force_color=None
     ):
-        self.cursor = Cursor(term)
+        self.cursor = cursor
         self.term = self.cursor.term
 
-        self._measure_terminal()
+        (self.x, self.y) = self._measure_terminal()
 
-        self._width_str = width
+        self.width = width
         self.max_value = max_value
 
         ensure(title_pos in ["left", "right", "above", "below"], ValueError,
                "Invalid choice for title position.")
-        self._title_pos = title_pos
+        self.title_pos = title_pos
         self.title = title
         ensure(num_rep in ["fraction", "percentage"], ValueError,
                "num_rep must be either 'fraction' or 'percentage'.")
-        self._num_rep = num_rep
-        self._indent = indent
+        self.num_rep = num_rep
+        self.indent = indent
 
-        self._start_char = start_char
-        self._end_char = end_char
+        self.start_char = start_char
+        self.end_char = end_char
 
         # Setup callables and characters depending on if terminal has
         #   has color support
         if force_color is not None:
             supports_colors = force_color
         else:
-            supports_colors = self._supports_colors(
+            supports_colors = check_color_support(
                 term=self.term,
                 raise_err=not fallback,
                 colors=(filled_color, empty_color)
             )
         if supports_colors:
-            self._filled_char = filled_char
-            self._empty_char = empty_char
-            self._filled = self._get_format_callable(
-                term=self.term,
-                color=filled_color,
-                back_color=back_color
-            )
-            self._empty = self._get_format_callable(
-                term=self.term,
-                color=empty_color,
-                back_color=back_color
-            )
+            self.filled_char = filled_char
+            self.empty_char = empty_char
+            self.filled_color = filled_color
+            self.empty_color = empty_color
+            self.back_color = back_color
         else:
-            self._empty_char = fallback_empty_char
-            self._filled_char = fallback_filled_char
-            self._filled = self._empty = lambda s: s
+            self.empty_char = fallback_empty_char
+            self.filled_char = fallback_filled_char
 
-        ensure(self.full_line_width <= self.columns, WidthOverflowError,
-               "Attempting to initialize Bar with full_line_width {}; "
-               "terminal has width of only {}.".format(
-                   self.full_line_width,
-                   self.columns))
+
+    def _measure_terminal(self):
+        return (
+            self.term.height or 24,
+            self.term.width or 80
+        )
+
+    def draw(self, value, newline=True, flush=True):
+        """"""
+        (self.x, self.y) = self._measure_terminal()
+
