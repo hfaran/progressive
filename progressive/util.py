@@ -3,11 +3,14 @@ import math
 import copy
 from itertools import chain
 
+import blessings
+
 from progressive.exceptions import ColorUnsupportedError
 
 
 def floor(x):
     """Returns the floor of ``x``
+
     :returns: floor of ``x``
     :rtype: int
     """
@@ -29,7 +32,7 @@ def u(s):
         that Python3 does not have a unicode() cast (for obvious reasons)
 
     :rtype: unicode
-    :returns: Equivalent of unicode(s) (at least I hope so)
+    :returns: Equivalent of Python2 ``unicode(s)``
     """
     return u'{}'.format(s)
 
@@ -40,7 +43,9 @@ def merge_dicts(dicts, deepcopy=False):
     In case of key conflicts, the value kept will be from the latter
     dictionary in the list of dictionaries
 
+    :type dicts: list
     :param dicts: [dict, ...]
+    :type deepcopy: bool
     :param deepcopy: deepcopy items within dicts
     """
     assert isinstance(dicts, list) and all(isinstance(d, dict) for d in dicts)
@@ -53,9 +58,11 @@ def check_color_support(term, raise_err, colors):
 
     :raises ColorUnsupportedError: This is raised if ``raise_err``
         is ``False`` and a color in ``colors`` is unsupported by ``term``
+    :type term: :class:`blessings.Terminal`
     :type raise_err: bool
     :param raise_err: Set to ``False`` to return a ``bool`` indicating
         color support rather than raising ColorUnsupportedError
+    :param colors: Colors to check support for
     :type  colors: [str, ...]
     """
     for color in colors:
