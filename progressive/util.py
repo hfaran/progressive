@@ -62,8 +62,8 @@ def check_color_support(term, raise_err, colors):
     :type raise_err: bool
     :param raise_err: Set to ``False`` to return a ``bool`` indicating
         color support rather than raising ColorUnsupportedError
-    :param colors: Colors to check support for
-    :type  colors: [str, ...]
+    :param colors: Colors to check support for (list of strings)
+    :type  colors: list
     """
     for color in colors:
         try:
