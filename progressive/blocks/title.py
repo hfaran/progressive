@@ -7,10 +7,10 @@ from progressive.util import u
 class Title(Block):
     """Title Block
 
-    :type  title: unicode|str
+    :type title: unicode|str
     :param title: Title for progress view (or just a simple string to be
         used anywhere)
-    :type  length: int|NoneType
+    :type length: int|None
     :param length: Custom length of ``title``; defaults as None in which
         it is calculated using len
     """

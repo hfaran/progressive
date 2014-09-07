@@ -14,9 +14,9 @@ from progressive.util import u
 class Line(object):
     """Line composed of ``Block``s
 
-    :type  blocks: list
+    :type blocks: list
     :param blocks: List of ``Block`` instances from which this Line is composed
-    :type  separator: unicode|str
+    :type separator: unicode|str
     :param separator: Separator between ``blocks``; empty by default
     """
 

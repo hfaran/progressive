@@ -7,7 +7,7 @@ from progressive.util import floor
 class Percentage(Block):
     """Percentage complete of a task
 
-    :type  decimal_value: float
+    :type decimal_value: float
     :param decimal_value: 0<=x<=1, usually value/max_value
     """
 

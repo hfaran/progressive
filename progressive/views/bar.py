@@ -3,6 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
+import progressive
 from progressive.util import floor, ensure, u, check_color_support
 from progressive.exceptions import ColorUnsupportedError, WidthOverflowError
 from progressive.blocks.indent import Indent
@@ -14,7 +15,7 @@ from progressive.blocks.percentage import Fraction, Percentage
 class Bar(object):
     """Basic progress bar
 
-    :type  cursor: progressive.cursor.Cursor
+    :type  cursor: :class:`progressive.cursor.Cursor`
     :type  max_value: int
     :param max_value: The capacity of the bar, i.e., ``value/max_value``
     :type  width: str

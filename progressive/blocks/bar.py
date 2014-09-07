@@ -3,6 +3,7 @@
 from __future__ import division
 from __future__ import unicode_literals
 
+import blessings
 from progressive.blocks.block import Block
 from progressive.util import ensure, u, floor
 
@@ -10,8 +11,8 @@ from progressive.util import ensure, u, floor
 class BaseBar(Block):
     """BaseBar Block
 
-    :type  term: blessings.Terminal|NoneType
-    :param term: blessings.Terminal instance for the terminal of display
+    :type  term: :class:`blessings.Terminal`|NoneType
+    :param term: :class:`blessings.Terminal` instance for the terminal of display
     :type  value: int
     :param value: Amount of the bar filled relative to ``max_value``
     :type  max_value: int
@@ -69,10 +70,11 @@ class BaseBar(Block):
         Get callable for string output using ``color`` on ``back_color``
             on ``term``
 
-        :param term: blessings.Terminal instance
+        :param term: :class:`blessings.Terminal` instance
         :param color: Color that callable will color the string it's passed
         :param back_color: Back color for the string
         :returns: callable(s: str) -> str
+        :rtype: callable
         """
         if isinstance(color, str):
             ensure(
