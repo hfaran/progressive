@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-
 from abc import abstractproperty, ABCMeta
 
 
-class Block(metaclass=ABCMeta):
+class Block(object):
     """Building block for a progress view"""
+    __metaclass__ = ABCMeta
 
     @abstractproperty
     def repr(self):
