@@ -26,7 +26,7 @@ class Line(object):
         self.blocks = blocks
         self.sep = u(separator)
 
-    def repr(self):
+    def view(self):
         return self.sep.join([b.view for b in self.blocks])
 
     def len(self):
