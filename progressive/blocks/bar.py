@@ -96,7 +96,7 @@ class BaseBar(Block):
             ))
 
     @property
-    def repr(self):
+    def view(self):
         return self._bar_str
 
     @property

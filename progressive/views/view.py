@@ -27,7 +27,7 @@ class Line(object):
         self.sep = u(separator)
 
     def repr(self):
-        return self.sep.join([b.repr for b in self.blocks])
+        return self.sep.join([b.view for b in self.blocks])
 
     def len(self):
         return sum(b.len for b in self.blocks)

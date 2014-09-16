@@ -15,7 +15,7 @@ class Percentage(Block):
         self._repr = u"{}%".format(str(floor(decimal_value * 100.0)).rjust(3))
 
     @property
-    def repr(self):
+    def view(self):
         return self._repr
 
     @property
@@ -30,7 +30,7 @@ class Fraction(Block):
         self._repr = u"{}/{}".format(numerator, denominator)
 
     @property
-    def repr(self):
+    def view(self):
         return self._repr
 
     @property

@@ -7,7 +7,7 @@ class Block(object):
     __metaclass__ = ABCMeta
 
     @abstractproperty
-    def repr(self):
+    def view(self):
         """Returns a unicode string representing the block
 
         :rtype: unicode|str
@@ -16,7 +16,7 @@ class Block(object):
 
     @abstractproperty
     def len(self):
-        """A more accurate ``len(self.repr)`` if ``self.repr``
+        """A more accurate ``len(self.view)`` if ``self.view``
         has custom formatting for which ``len`` gives incorrect output.
 
         :rtype: list|int
@@ -24,4 +24,4 @@ class Block(object):
         raise NotImplementedError
 
     def __str__(self):
-        return "{}({})".format(self.__class__.__name__, self.repr)
+        return "{}({})".format(self.__class__.__name__, self.view)

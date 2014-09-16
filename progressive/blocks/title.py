@@ -19,7 +19,7 @@ class Title(Block):
         self._length = length if length is not None else len(self._repr)
 
     @property
-    def repr(self):
+    def view(self):
         return self._repr
 
     @property

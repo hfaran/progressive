@@ -17,7 +17,7 @@ class Indent(Block):
         self._repr = u(character*length)
 
     @property
-    def repr(self):
+    def view(self):
         return self._repr
 
     @property
