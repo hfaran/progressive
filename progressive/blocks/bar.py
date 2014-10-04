@@ -11,7 +11,7 @@ from progressive.util import ensure, u, floor
 class BaseBar(Block):
     """BaseBar Block
 
-    :type  term: :class:`blessings.Terminal`|NoneType
+    :type  term: blessings.Terminal|None
     :param term: :class:`blessings.Terminal` instance for the terminal of display
     :type  value: int
     :param value: Amount of the bar filled relative to ``max_value``
@@ -76,7 +76,7 @@ class BaseBar(Block):
         :returns: callable(s: str) -> str
         :rtype: callable
         """
-        if isinstance(color, str):
+        if isinstance(color, basestring):
             ensure(
                 any(isinstance(back_color, t) for t in [str, type(None)]),
                 TypeError,
@@ -87,7 +87,7 @@ class BaseBar(Block):
                     [color, "on", back_color]
                 ))
             elif back_color is None:
-                return getattr(term, color)
+                return getattr(term, str(color))
         elif isinstance(color, int):
             return term.on_color(color)
         else:
