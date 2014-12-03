@@ -7,6 +7,10 @@ from progressive.util import floor
 class Percentage(Block):
     """Percentage complete of a task
 
+    Percentage is right-adjusted by three always, so the length of
+    a Percentage is always 4 characters (when within 0-999% as a
+    representation of course.
+
     :type decimal_value: float
     :param decimal_value: 0<=x<=1, usually value/max_value
     """
