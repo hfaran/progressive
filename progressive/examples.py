@@ -13,6 +13,30 @@ from progressive.bar import Bar
 from progressive.tree import ProgressTree, Value, BarDescriptor
 
 
+def simple():
+    """Simple example using just the Bar class
+
+    This example is intended to show usage of the Bar class at the lowest
+    level.
+    """
+    MAX_VALUE = 100
+
+    # Create our test progress bar
+    bar = Bar(max_value=MAX_VALUE, fallback=True)
+
+    bar.cursor.clear_lines(2)
+     # Before beginning to draw our bars, we save the position
+    #   of our cursor so we can restore back to this position before writing
+    #   the next time.
+    bar.cursor.save()
+    for i in range(MAX_VALUE + 1):
+        sleep(0.1 * random.random())
+        # We restore the cursor to saved position before writing
+        bar.cursor.restore()
+        # Now we draw the bar
+        bar.draw(value=i)
+
+
 def tree():
     """Example showing tree progress view"""
 
@@ -85,27 +109,3 @@ def tree():
         incr_value(test_d)
         # Actually draw out the bars
         n.draw(test_d, BarDescriptor(bd_defaults))
-
-
-def simple():
-    """Simple example using just the Bar class
-
-    This example is intended to show usage of the Bar class at the lowest
-    level.
-    """
-    MAX_VALUE = 100
-
-    # Create our test progress bar
-    bar = Bar(max_value=MAX_VALUE, fallback=True)
-
-    bar.cursor.clear_lines(2)
-     # Before beginning to draw our bars, we save the position
-    #   of our cursor so we can restore back to this position before writing
-    #   the next time.
-    bar.cursor.save()
-    for i in range(MAX_VALUE + 1):
-        sleep(0.1 * random.random())
-        # We restore the cursor to saved position before writing
-        bar.cursor.restore()
-        # Now we draw the bar
-        bar.draw(value=i)
