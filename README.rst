@@ -48,7 +48,7 @@ Getting Started
 
 .. |Build Status| image:: https://travis-ci.org/hfaran/progressive.svg?branch=master
    :target: https://travis-ci.org/hfaran/progressive?branch=master
-.. |Coverage Status| image:: https://coveralls.io/repos/hfaran/progressive/badge.png?branch=master
+.. |Coverage Status| image:: https://coveralls.io/repos/hfaran/progressive/badge.svg?branch=master
    :target: https://coveralls.io/r/hfaran/progressive?branch=master
 .. |PyPI version| image:: https://badge.fury.io/py/progressive.svg
    :target: http://badge.fury.io/py/progressive
