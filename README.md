@@ -35,5 +35,5 @@ python setup.py install
 
 ## Getting Started
 
-* Documentation is coming soon, but in the meantime check out the [examples](https://github.com/hfaran/progressive/blob/master/progressive/examples.py).
+* There is preliminary documentation is available at [readthedocs](http://progressive.readthedocs.org/) but more detailed documentation is coming soon on completion of the 1.0 API, but in the meantime check out the [examples](https://github.com/hfaran/progressive/blob/master/progressive/examples.py).
 * `progressive` supports graceful fallback modes for terminals without colors, [but you really should upgrade your terminal to 256 colors](http://pastelinux.wordpress.com/2010/12/01/upgrading-linux-terminal-to-256-colors/) to make full use of `progressive`.
