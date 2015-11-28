@@ -50,6 +50,7 @@ class Cursor(object):
 
     def clear_lines(self, num_lines=0):
         for i in range(num_lines):
+            self.write(self.term.clear_eol)
             self.write(self.term.move_down)
         for i in range(num_lines):
             self.write(self.term.move_up)
