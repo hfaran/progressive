@@ -97,11 +97,16 @@ class ProgressTree(object):
         # TODO: Automatically collapse hierarchy so something
         #   will always be displayable (well, unless the top-level)
         #   contains too many to display
-        lines_required = self.lines_required(tree)
-        ensure(lines_required <= self.cursor.term.height,
-               LengthOverflowError,
-               "Terminal is not long ({} rows) enough to fit all bars "
-               "({} rows).".format(self.cursor.term.height, lines_required))
+        will_fit = False
+        while not will_fit:
+            lines_required = self.lines_required(tree)
+            will_fit = lines_required < self.cursor.term.height
+            if not will_fit:
+                tree = self._truncate_tree(tree)
+        # ensure(lines_required <= self.cursor.term.height,
+        #        LengthOverflowError,
+        #        "Terminal is not long ({} rows) enough to fit all bars "
+        #        "({} rows).".format(self.cursor.term.height, lines_required))
         bar_desc = BarDescriptor(type=Bar) if not bar_desc else bar_desc
         self._calculate_values(tree, bar_desc)
         self._draw(tree)
@@ -137,6 +142,19 @@ class ProgressTree(object):
     ###################
     # Private Methods #
     ###################
+
+    def _truncate_tree(self, tree, levels=1):
+        """
+
+        :param dict tree: Tree to truncate
+        :param int levels: Levels to truncate (i.e., the new depth of the
+            tree will be depth(tree)-levels)
+        :return: Truncated tree
+        :rtype: dict
+        """
+        pass
+        if isinstance(tree, dict) and type(tree) != BarDescriptor:
+
 
     def _calculate_values(self, tree, bar_d):
         """Calculate values for drawing bars of non-leafs in ``tree``
