@@ -351,8 +351,9 @@ class Bar(object):
         #   the terminal since the code is mostly written dynamically
         #   and many attributes and dynamically calculated properties.
         self._measure_terminal()
-
-        amount_complete = value / self.max_value
+        
+        # To avoid zero division, set amount_complete to 100% if max_value has been stupidly set to 0
+        amount_complete = 1.0 if self.max_value == 0 else value / self.max_value
         fill_amount = int(floor(amount_complete * self.max_width))
         empty_amount = self.max_width - fill_amount
 
