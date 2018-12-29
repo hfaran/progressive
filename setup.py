@@ -24,6 +24,7 @@ setup(
     author='Hamza Faran',
     description=('Terminal progress bars for Python with blessings'),
     long_description=long_description,
+    long_description_content_type='text/markdown',
     packages=['progressive'],
     install_requires = install_requires,
     classifiers=[
